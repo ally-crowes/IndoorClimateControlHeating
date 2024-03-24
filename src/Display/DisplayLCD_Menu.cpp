@@ -1,4 +1,5 @@
 #include "includes.h"
+#include "DisplayLCD_Menu.h"
 
 DisplayLCD_Menu::DisplayLCD_Menu(LiquidCrystal_I2C* lcd, 
     ControllerEngine* controlEngine, ControllerIndoor* controlIndoor,

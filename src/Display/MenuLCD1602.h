@@ -1,5 +1,5 @@
-#ifndef __MENULCD1602_h__
-#define __MENULCD1602_h__
+#ifndef __MENULCD1602_H__
+#define __MENULCD1602_H__
 
 class MenuLCD1602
 {
@@ -27,8 +27,7 @@ private:
     enum Cursor
     {
         Not,
-        Select,
-        Edit
+        Set
     };
 
     LiquidCrystal_I2C* lcd;
@@ -36,8 +35,6 @@ private:
     ControllerIndoor* controlIndoor;
     DS3231* rtc;
 
-    void PatternEngineLogo();
-    void PatternIndoorLogo();
     void PatternConditionIndoor(int col, int row);
     void PatternConditionEngine(int col, int row);
     void PatternConditionRelayEngine(int col, int row);
@@ -53,9 +50,13 @@ public:
     MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* rtc);
     ~MenuLCD1602();
 
-    void PrintMainMenu();
-    void PrintEngineSubmenu();
-    void PrintIndoorSubmenu();
+    void Initialize();
+    // void PrintMainMenu();
+    void PrintMainMenu(int selected = 0);
+    // void PrintEngineSubmenu();
+    void PrintEngineSubmenu(int selected = 0);
+    // void PrintIndoorSubmenu();
+    void PrintIndoorSubmenu(int selected = 0);
 };
 
 #endif
