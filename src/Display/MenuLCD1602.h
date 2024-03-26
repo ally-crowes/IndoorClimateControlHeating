@@ -51,11 +51,8 @@ public:
     ~MenuLCD1602();
 
     void Initialize();
-    // void PrintMainMenu();
     void PrintMainMenu(int selected = 0);
-    // void PrintEngineSubmenu();
     void PrintEngineSubmenu(int selected = 0);
-    // void PrintIndoorSubmenu();
     void PrintIndoorSubmenu(int selected = 0);
 };
 

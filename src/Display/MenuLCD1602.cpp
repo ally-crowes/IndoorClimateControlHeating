@@ -2,15 +2,27 @@
 #include "MenuLCD1602.h"
 
 MenuLCD1602::MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* rtc)
+    : lcd{lcd}, controlEngine{controlEngine}, controlIndoor{controlIndoor}, rtc{rtc}
 {
-    this->lcd = lcd;
-    this->controlEngine = controlEngine;
-    this->controlIndoor = controlIndoor;
-    this->rtc = rtc;
 }
 
 MenuLCD1602::~MenuLCD1602()
 {
+}
+
+void MenuLCD1602::Initialize()
+{
+    // LCD-Character Create
+    lcd->createChar(1, custom_termometr_Cool);
+    lcd->createChar(2, custom_termometr_Heat);
+    lcd->createChar(3, custom_selected);
+    lcd->createChar(4, custom_home);
+    // lcd->createChar(5, custom_engine);
+    lcd->createChar(5, custom_heat);
+    lcd->createChar(6, custom_play);
+    lcd->createChar(7, custom_pause);
+
+    PrintMainMenu();
 }
 
 /*
@@ -182,30 +194,11 @@ void MenuLCD1602::PatternCursor(int col, int row, Cursor cursor)
  * Print
 */
 
-void MenuLCD1602::Initialize()
-{
-    // LCD-Character Create
-    lcd->createChar(1, custom_termometr_Cool);
-    lcd->createChar(2, custom_termometr_Heat);
-    lcd->createChar(3, custom_selected);
-    lcd->createChar(4, custom_home);
-    // lcd->createChar(5, custom_engine);
-    lcd->createChar(5, custom_heat);
-    lcd->createChar(6, custom_play);
-    lcd->createChar(7, custom_pause);
-
-    PrintMainMenu();
-}
-
-// void MenuLCD1602::PrintMainMenu()
-// {
-//     PrintMainMenu(0);
-// }
-
 void MenuLCD1602::PrintMainMenu(int selected)
 {
     // 1 string
 
+    // Cursor select Indoor
     if (selected == 1)
     {
         PatternCursor(0, 0, Set);
@@ -226,6 +219,7 @@ void MenuLCD1602::PrintMainMenu(int selected)
 
     // 2 string
 
+    // Cursor select Engine
     if (selected == 2)
     {
         PatternCursor(0, 1, Set);
@@ -246,23 +240,9 @@ void MenuLCD1602::PrintMainMenu(int selected)
     PatternConditionRelayEngine(12, 1);
 }
 
-// void MenuLCD1602::PrintEngineSubmenu()
-// {
-//     PrintEngineSubmenu(0);
-// }
-
 void MenuLCD1602::PrintEngineSubmenu(int selected)
 {
     // 1 string
-
-    if (selected == 1)
-    {
-        PatternCursor(5, 0, Set);
-    }
-    else 
-    {
-        PatternCursor(5, 0, Not);
-    }
 
     // Engine Logo
     lcd->setCursor(0, 0);
@@ -274,11 +254,25 @@ void MenuLCD1602::PrintEngineSubmenu(int selected)
     // Engine ConditionRelay
     PatternConditionRelayEngine(3, 0);
 
+    // Cursor select Min Temperature
+    if (selected == 1)
+    {
+        PatternCursor(5, 0, Set);
+    }
+    else 
+    {
+        PatternCursor(5, 0, Not);
+    }
+
     // Engine Min Temperature
     PatternMinTemperature(6, 0, Control::Engine);
 
     // 2 string
 
+    // Engine Temperature
+    PatternTemperature(0, 1, Engine);
+
+    // Cursor select Max Temperature
     if (selected == 2)
     {
         PatternCursor(5, 1, Set);
@@ -288,32 +282,13 @@ void MenuLCD1602::PrintEngineSubmenu(int selected)
         PatternCursor(5, 1, Not);
     }
 
-    // Engine Temperature
-    lcd->setCursor(0, 1);
-    lcd->print(controlEngine->GetTemperature());
-    //PatternTemperature(0, 1, Control::Engine);
-
     // Engine Max Temperature
     PatternMaxTemperature(6, 1, Control::Engine);
 }
 
-// void MenuLCD1602::PrintIndoorSubmenu()
-// {
-//     PrintIndoorSubmenu(0);
-// }
-
 void MenuLCD1602::PrintIndoorSubmenu(int selected)
 {
     // 1 string
-
-    if (selected == 1)
-    {
-        PatternCursor(5, 0, Set);
-    }
-    else 
-    {
-        PatternCursor(5, 0, Not);
-    }
 
     // Indoor Logo
     lcd->setCursor(0, 0);
@@ -325,11 +300,25 @@ void MenuLCD1602::PrintIndoorSubmenu(int selected)
     // Indoor ConditionRelay
     PatternConditionRelayIndoor(3, 0);
 
+    // Cursor select Min Temperature
+    if (selected == 1)
+    {
+        PatternCursor(5, 0, Set);
+    }
+    else 
+    {
+        PatternCursor(5, 0, Not);
+    }
+
     // Indoor Min Temperature
     PatternMinTemperature(6, 0, Indoor);
 
     // 2 string
     
+    // Indoor Temperature
+    PatternTemperature(0, 1, Indoor);
+    
+    // Cursor select Max Temperature
     if (selected == 2)
     {
         PatternCursor(5, 1, Set);
@@ -338,11 +327,6 @@ void MenuLCD1602::PrintIndoorSubmenu(int selected)
     {
         PatternCursor(5, 1, Not);
     }
-
-    // Indoor Temperature
-    lcd->setCursor(0, 1);
-    lcd->print(controlIndoor->GetTemperature());
-    //PatternTemperature(0, 1, Control::Indoor);
 
     // Indoor Max Temperature
     PatternMaxTemperature(6, 1, Indoor);
