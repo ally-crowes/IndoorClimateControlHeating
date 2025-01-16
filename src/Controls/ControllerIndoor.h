@@ -8,8 +8,8 @@ private:
     SensorTypeNTC* sensorInternal;
     Relay* pump;
     ControllerEngine* controlEngine;
-    bool flagWait = false;
-    bool flagTimerPump = false;
+    bool flagDriversWait = false;
+    bool flagPumpWait = false;
     unsigned long delayPumpOff = 10000;   // Затримка перед вимкненям насосу після повного нагріву кімнат (10 сек)
     unsigned long delayPumpOn = 3000;   // Затримка увимкненям нагрівачів після увімкниням насосу (3 сек)
 

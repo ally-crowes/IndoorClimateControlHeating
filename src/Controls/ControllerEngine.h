@@ -43,7 +43,7 @@ private:
     ModeSwitchingDevice switching = ModeSwitchingDevice::FirstOnly;
     unsigned int count = 0;
     bool flagRelay = false;
-    bool flagWait = false;
+    bool flagDriversWait = false;
 
     void RelaysOn();
     void RelaysOff();

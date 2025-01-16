@@ -26,13 +26,13 @@ void ControllerIndoor::Update()
     switch (controlEngine->GetAction())
     {
     case ModeAction::Heat:
-        if (flagWait == false)
+        if (flagDriversWait == false)
         {
-            if (flagTimerPump)
+            if (flagPumpWait)
             {
                 if ((millis() - timerPump) > delayPumpOn)
                 {
-                    flagTimerPump = false;
+                    flagPumpWait = false;
                 }
             }
             else
@@ -44,32 +44,32 @@ void ControllerIndoor::Update()
                 else // Begin - Wait Engine
                 {
                     controlEngine->Wait();
-                    flagWait = true;
+                    flagDriversWait = true;
 
-                    flagTimerPump = true;
+                    flagPumpWait = true;
                     timerPump = millis();
                 }
             }
         }
         else
         {
-            if (flagTimerPump)
+            if (flagPumpWait)
             {
                 if ((millis() - timerPump) > delayPumpOff)
                 {
-                    flagTimerPump = false;
+                    flagPumpWait = false;
                     SetConditionPump(false);
                 }
             }
 
             if (temperatureCurent <= sensorInternal->GetMin())  // End - Wait Engine
             {
-                flagWait = false;
+                flagDriversWait = false;
 
                 SetConditionPump(true);
                 timerPump = millis();
                 
-                flagTimerPump = true;
+                flagPumpWait = true;
             }
         }
         break;
@@ -95,7 +95,7 @@ void ControllerIndoor::Update()
 
 bool ControllerIndoor::GetCondition()
 {
-    return !flagWait;
+    return !flagDriversWait;
 }
 
 void ControllerIndoor::SetConditionPump(bool value)

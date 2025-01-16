@@ -28,6 +28,7 @@ ButtonTTB* buttonRight = new ButtonTTB(BUTTON_3);
 
 // DisplayLCD_Menu* display = new DisplayLCD_Menu(lcd, controlEngine, controlIndoor, buttonLeft, buttonModeSet, buttonRight, clockRTC);
 MenuLCD1602* menu = new MenuLCD1602(lcd, controlEngine, controlIndoor, clockRTC);
+ControllerPacket* ledControl = new ControllerPacket(menu);
 
 int incomingByte = 0x30;
 
@@ -56,7 +57,7 @@ void setup()
   lcd->backlight();
   // lcd->clear();
 
-  menu->PrintMainMenu();
+  menu->Initialize();
 }
 
 void loop()
@@ -65,9 +66,9 @@ void loop()
   controlIndoor->Update();
 
   // display->Update();
-  // menu->PrintMainMenu();
-  // menu->PrintIndoorSubmenu();
-  // menu->PrintEngineSubmenu();
+  // menu->printMainMenu();
+  // menu->printIndoorSubmenu();
+  // menu->printEngineSubmenu();
 
   if (Serial.available() > 0)
   {
@@ -75,20 +76,34 @@ void loop()
     incomingByte = Serial.read();
     lcd->clear();
     Serial.println(incomingByte, DEC);
+    ledControl->update(incomingByte);
+  }
+  else
+  {
+    ledControl->update();
   }
 
-  if (incomingByte == 0x30)
-  {
-    menu->PrintMainMenu();
-  }
-  else if (incomingByte == 0x31)
-  {
-    menu->PrintIndoorSubmenu();
-  }
-  else if (incomingByte == 0x32)
-  {
-    menu->PrintEngineSubmenu();
-  }
+  // if (incomingByte == 0x30)
+  // {
+  //   menu->printMainMenu();
+  // }
+  // else if (incomingByte == 0x33)
+  // {
+  //   menu->printMainMenu(1);
+  // }
+  // else if (incomingByte == 0x34)
+  // {
+  //   menu->printMainMenu(2);
+  // }
+
+  // else if (incomingByte == 0x31)
+  // {
+  //   menu->printIndoorSubmenu(0);
+  // }
+  // else if (incomingByte == 0x32)
+  // {
+  //   menu->printEngineSubmenu(0);
+  // }
 
   /*
   bool pin_button_flag = buttonRight->keyDown();

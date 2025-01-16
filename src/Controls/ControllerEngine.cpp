@@ -50,7 +50,7 @@ void ControllerEngine::Update()
     switch (action)
     {
     case ModeAction::Heat:
-        if (flagWait == false)
+        if (flagDriversWait == false)
         {
             if (temperatureCurent <= sensorEngine->GetMax())
                 RelaysOn();
@@ -59,12 +59,12 @@ void ControllerEngine::Update()
         }
         else if (temperatureCurent <= sensorEngine->GetMin())
         {
-            flagWait = false;
+            flagDriversWait = false;
         }
         break;
 
     case ModeAction::Coll:
-        if (flagWait == false)
+        if (flagDriversWait == false)
         {
             if (temperatureCurent >= sensorEngine->GetMin())
                 RelaysOn();
@@ -73,7 +73,7 @@ void ControllerEngine::Update()
         }
         else if (temperatureCurent >= sensorEngine->GetMax())
         {
-            flagWait = false;
+            flagDriversWait = false;
         }
         break;
 
@@ -134,13 +134,13 @@ void ControllerEngine::RelaysOn()
 
 void ControllerEngine::RelaysOff()
 {
-    if (flagWait == false)
+    if (flagDriversWait == false)
     {
         relayA->SetCondition(false);
         relayB->SetCondition(false);
 
         flagRelay = false;
-        flagWait = true;
+        flagDriversWait = true;
     }
 }
 
@@ -173,7 +173,7 @@ bool ControllerEngine::GetConditionRelay(int n)
 bool ControllerEngine::GetCondition()
 {
     // return (!relayA->GetCondition() && !relayB->GetCondition()) ? false : true;
-    return !flagWait;
+    return !flagDriversWait;
 }
 
 float ControllerEngine::GetMinTemperature()
