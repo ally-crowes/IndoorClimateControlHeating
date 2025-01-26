@@ -21,14 +21,14 @@ void MenuLCD1602::Initialize()
     lcd->createChar(6, custom_play);
     lcd->createChar(7, custom_pause);
 
-    printMainMenu();
+    printMainmenu();
 }
 
 /*
  * Pattern
  */
 
-void MenuLCD1602::patternConditionIndoor(int col, int row)
+void MenuLCD1602::conditionObjectIndoor(int col, int row)
 {
     lcd->setCursor(col, row);
 
@@ -43,7 +43,7 @@ void MenuLCD1602::patternConditionIndoor(int col, int row)
     }
 }
 
-void MenuLCD1602::patternConditionEngine(int col, int row)
+void MenuLCD1602::conditionObjectEngine(int col, int row)
 {
     lcd->setCursor(col, row);
 
@@ -66,7 +66,7 @@ void MenuLCD1602::patternConditionEngine(int col, int row)
     }
 }
 
-void MenuLCD1602::patternConditionRelayEngine(int col, int row)
+void MenuLCD1602::conditionRelayEngine(int col, int row)
 {
     lcd->setCursor(col, row);
 
@@ -93,7 +93,7 @@ void MenuLCD1602::patternConditionRelayEngine(int col, int row)
     }
 }
 
-void MenuLCD1602::patternConditionRelayIndoor(int col, int row)
+void MenuLCD1602::conditionRelayIndoor(int col, int row)
 {
     lcd->setCursor(col, row);
 
@@ -109,25 +109,11 @@ void MenuLCD1602::patternConditionRelayIndoor(int col, int row)
     }
 }
 
-void MenuLCD1602::patternTemperatureIndoor(int col, int row)
-{
-    lcd->setCursor(col, row);
-    lcd->print("\4="); // "T(Indoor)="
-    patternTemperature(col+2, row, Control::Indoor);
-}
-
-void MenuLCD1602::patternTemperatureEngine(int col, int row)
-{
-    lcd->setCursor(col, row);
-    lcd->print("\5="); //"T(engine)="
-    patternTemperature(col+2, row, Engine);
-}
-
-void MenuLCD1602::patternTemperature(int col, int row, Control control)
+void MenuLCD1602::patternTemperature(int col, int row, Screen screen, bool visableChar)
 {
     lcd->setCursor(col, row);
 
-    if (control == Engine)
+    if (screen == ScreenEngine)
     {
         lcd->print(controlEngine->GetTemperature());
     }
@@ -136,16 +122,19 @@ void MenuLCD1602::patternTemperature(int col, int row, Control control)
         lcd->print(controlIndoor->GetTemperature());
     }
 
-    lcd->write(223);
+    if (visableChar)
+    {
+        lcd->write(223);
+    }
 }
 
-void MenuLCD1602::patternTemperatureMin(int col, int row, Control control)
+void MenuLCD1602::patternTemperatureMin(int col, int row, Screen screen)
 {
     lcd->setCursor(col, row);
 
     lcd->print("min=");
 
-    if (control == Engine)
+    if (screen == ScreenEngine)
     {
         lcd->print(controlEngine->GetMinTemperature());
     }
@@ -157,13 +146,13 @@ void MenuLCD1602::patternTemperatureMin(int col, int row, Control control)
     lcd->write(223);
 }
 
-void MenuLCD1602::patternTemperatureMax(int col, int row, Control control)
+void MenuLCD1602::patternTemperatureMax(int col, int row, Screen screen)
 {
     lcd->setCursor(col, row);
 
     lcd->print("max=");
 
-    if (control == Control::Engine)
+    if (screen == ScreenEngine)
     {
         lcd->print(controlEngine->GetMaxTemperature());
     }
@@ -175,7 +164,7 @@ void MenuLCD1602::patternTemperatureMax(int col, int row, Control control)
     lcd->write(223);
 }
 
-void MenuLCD1602::patternCursor(int col, int row, Cursor cursor)
+void MenuLCD1602::patternCursor(int col, int row, Control cursor)
 {
     lcd->setCursor(col, row);
 
@@ -193,157 +182,158 @@ void MenuLCD1602::patternCursor(int col, int row, Cursor cursor)
  * Print
 */
 
-void MenuLCD1602::printMainMenu(int selected)
+void MenuLCD1602::printMainmenu(int select)
 {
-    // 1 string
-
-    // Cursor select Indoor
-    if (selected == 1)
-    {
-        patternCursor(0, 0, Set);
-    }
-    else if (selected == 2)
-    {
-        patternCursor(0, 1, Set);
-    }
-    else
-    {
-        patternCursor(0, 0, Not);
-    }
+    // 1 Row (string)
 
     // Indoor Temperature
-    patternTemperatureIndoor(1, 0);
+    lcd->setCursor(1, 0);
+    lcd->print("\4=");
+    patternTemperature(3, 0, ScreenIndoor);
 
     // Indoor Condition Temperature
-    patternConditionIndoor(10, 0);
+    conditionObjectIndoor(10, 0);
 
     // Indoor Condition Pump
-    patternConditionRelayIndoor(12, 0);
+    conditionRelayIndoor(12, 0);
 
-    // 2 string
-
-    // Cursor select Engine
-    if (selected == 2)
-    {
-        patternCursor(0, 1, Set);
-    }
-    else
-    {
-        patternCursor(0, 1, Not);
-    }
+    // 2 Row (string)
 
     // Engine Temperature
-    patternTemperatureEngine(1, 1);
+    lcd->setCursor(1, 1);
+    lcd->print("\5=");
+    patternTemperature(3, 1, ScreenEngine);
 
     // Engine Condition Temperature
-    patternConditionEngine(10, 1);
+    conditionObjectEngine(10, 1);
 
     // Engine RelayA status
     // Engine RelayB status
-    patternConditionRelayEngine(12, 1);
+    conditionRelayEngine(12, 1);
+
+
+    ///
+    // 1&2 Row
+    //
+
+    // Set cursor
+    cursorTriggerCol(select, 0);
 }
 
-void MenuLCD1602::printEngineSubmenu(int selected)
+void MenuLCD1602::printEngineSubmenu(int select)
 {
-    // 1 string
+    //
+    // 1 Row (string)
+    //
 
     // Engine Logo
     lcd->setCursor(0, 0);
     lcd->print("\5");
 
     // Engine Condition
-    patternConditionEngine(2, 0);
+    conditionObjectEngine(2, 0);
 
     // Engine ConditionRelay
-    patternConditionRelayEngine(3, 0);
-
-    // Cursor select Min Temperature
-    if (selected == 1)
-    {
-        patternCursor(5, 0, Set);
-    }
-    else if (selected == 2)
-    {
-        patternCursor(5, 1, Set);
-    }
-    else 
-    {
-        patternCursor(5, 0, Not);
-    }
+    conditionRelayEngine(3, 0);
 
     // Engine Min Temperature
-    patternTemperatureMin(6, 0, Control::Engine);
+    patternTemperatureMin(6, 0, ScreenEngine);
 
-    // 2 string
+    //
+    // 2 Row (string)
+    //
 
     // Engine Temperature
-    patternTemperature(0, 1, Engine);
-
-    // Cursor select Max Temperature
-    if (selected == 2)
-    {
-        patternCursor(5, 1, Set);
-    }
-    else 
-    {
-        patternCursor(5, 1, Not);
-    }
+    patternTemperature(0, 1, ScreenEngine, false);
 
     // Engine Max Temperature
-    patternTemperatureMax(6, 1, Control::Engine);
+    patternTemperatureMax(6, 1, ScreenEngine);
+    
+    //
+    // 1&2 Row
+    //
+
+    // Set cursor
+    cursorTriggerCol(select, 5);
 }
 
-void MenuLCD1602::printIndoorSubmenu(int selected)
+void MenuLCD1602::printIndoorSubmenu(int select)
 {
-    // 1 string
+    //
+    // 1 Row (string)
+    //
 
     // Indoor Logo
     lcd->setCursor(0, 0);
     lcd->print("\4");
 
     // Indoor Condition
-    patternConditionIndoor(2, 0);
+    conditionObjectIndoor(2, 0);
 
     // Indoor ConditionRelay
-    patternConditionRelayIndoor(3, 0);
-
-    // Cursor select Min Temperature
-    if (selected == 1)
-    {
-        patternCursor(5, 0, Set);
-    }
-    else if (selected == 2)
-    {
-        patternCursor(5, 1, Set);
-    }
-    else 
-    {
-        patternCursor(5, 0, Not);
-    }
+    conditionRelayIndoor(3, 0);
 
     // Indoor Min Temperature
-    patternTemperatureMin(6, 0, Indoor);
-
-    // 2 string
+    patternTemperatureMin(6, 0, ScreenIndoor);
+    
+    //
+    // 2 Row (string)
+    //
     
     // Indoor Temperature
-    patternTemperature(0, 1, Indoor);
-    
-    // Cursor select Max Temperature
-    if (selected == 2)
-    {
-        patternCursor(5, 1, Set);
-    }
-    else 
-    {
-        patternCursor(5, 1, Not);
-    }
+    patternTemperature(0, 1, ScreenIndoor, false);
 
     // Indoor Max Temperature
-    patternTemperatureMax(6, 1, Indoor);
+    patternTemperatureMax(6, 1, ScreenIndoor);
+    
+    //
+    // 1&2 Row
+    //
+
+    // Set cursor
+    cursorTriggerCol(select, 5);
 }
 
-void MenuLCD1602::printException(int marker, int code)
+// Set single position column for 1&2 row
+void MenuLCD1602::cursorTriggerCol(int select, int col)
+{
+
+    // if (oldSelect != select)
+    // {
+    //     Serial.print("select-");
+    //     Serial.print(select);
+    //     Serial.print(" oldSelect-");
+    //     Serial.println(oldSelect);
+
+        switch (select)
+        {
+        case 0:
+            patternCursor(col, 0, Not);
+            patternCursor(col, 1, Not);
+            break;
+        case 1:
+            patternCursor(col, 0, Set);
+            patternCursor(col, 1, Not);
+            break;
+        case 2:
+            patternCursor(col, 0, Not);
+            patternCursor(col, 1, Set);
+            break;
+
+        default:
+            break;
+        }
+
+        oldSelect = select;
+   // }
+}
+
+void MenuLCD1602::clear()
+{
+    lcd->clear();
+}
+
+void MenuLCD1602::printException(const char *marker, int code)
 {
     lcd->clear();
     lcd->setCursor(0, 0);

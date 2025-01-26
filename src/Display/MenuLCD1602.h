@@ -28,13 +28,16 @@ private:
     enum Control
     {
         Engine,
-        Indoor
-    };
-
-    enum Cursor
-    {
+        Indoor,
         Not,
         Set
+    };
+
+    enum Screen
+    {
+        ScreenMain,
+        ScreenEngine,
+        ScreenIndoor,
     };
 
     LiquidCrystal_I2C* lcd;
@@ -42,26 +45,32 @@ private:
     ControllerIndoor* controlIndoor;
     DS3231* rtc;
 
-    void patternConditionIndoor(int col, int row);
-    void patternConditionEngine(int col, int row);
-    void patternConditionRelayEngine(int col, int row);
-    void patternConditionRelayIndoor(int col, int row);
-    void patternTemperatureIndoor(int col, int row);
-    void patternTemperatureEngine(int col, int row);
-    void patternTemperature(int col, int row, Control control);
-    void patternTemperatureMin(int col, int row, Control control);
-    void patternTemperatureMax(int col, int row, Control control);
-    void patternCursor(int col, int row, Cursor cursor);
+    unsigned long commonTimer;
+    int oldSelect = 99;
+
+    void conditionObjectIndoor(int col, int row);
+    void conditionObjectEngine(int col, int row);
+    void conditionRelayEngine(int col, int row);
+    void conditionRelayIndoor(int col, int row);
+    void patternTemperature(int col, int row, Screen control, bool visableChar = true);
+    void patternTemperatureMin(int col, int row, Screen control);
+    void patternTemperatureMax(int col, int row, Screen control);
+    void patternCursor(int col, int row, Control cursor);
+    void cursorTriggerCol(int select, int col);
 
 public:
+
     MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* rtc);
     ~MenuLCD1602();
 
+    bool blink = false;
+
     void Initialize();
-    void printMainMenu(int selected = 0);
-    void printEngineSubmenu(int selected = 0);
-    void printIndoorSubmenu(int selected = 0);
-    void printException(int marker, int code);
+    void printMainmenu(int select = 0);
+    void printEngineSubmenu(int select = 0);
+    void printIndoorSubmenu(int select = 0);
+    void printException(const char *marker, int code);
+    void clear();
 };
 
 #endif

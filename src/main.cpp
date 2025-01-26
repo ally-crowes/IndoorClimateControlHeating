@@ -28,7 +28,7 @@ ButtonTTB* buttonRight = new ButtonTTB(BUTTON_3);
 
 // DisplayLCD_Menu* display = new DisplayLCD_Menu(lcd, controlEngine, controlIndoor, buttonLeft, buttonModeSet, buttonRight, clockRTC);
 MenuLCD1602* menu = new MenuLCD1602(lcd, controlEngine, controlIndoor, clockRTC);
-ControllerPacket* ledControl = new ControllerPacket(menu);
+ControllerPacket* ledControl = new ControllerPacket(menu, controlEngine, controlIndoor);
 
 int incomingByte = 0x30;
 
@@ -74,9 +74,20 @@ void loop()
   {
     // считываем входящий байт:
     incomingByte = Serial.read();
-    lcd->clear();
     Serial.println(incomingByte, DEC);
     ledControl->update(incomingByte);
+  }
+  else if (buttonLeft->keyDown())
+  {
+    ledControl->update(0x2B);
+  }
+  else if (buttonRight->keyDown())
+  {
+    ledControl->update(0x2D);
+  }
+  else if (buttonModeSet->keyDown())
+  {
+    ledControl->update(0x73);
   }
   else
   {
