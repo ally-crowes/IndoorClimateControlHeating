@@ -12,6 +12,7 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 #include <DS3231.h>
+#include <avr/eeprom.h>
 /* 
     Debugging: Compatible Tools - avr-stub
 */

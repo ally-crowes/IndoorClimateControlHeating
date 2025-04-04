@@ -1,7 +1,7 @@
 #include "MenuLCD1602.h"
 
-MenuLCD1602::MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* rtc)
-    : lcd{lcd}, controlEngine{controlEngine}, controlIndoor{controlIndoor}, rtc{rtc}
+MenuLCD1602::MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* clockRTC)
+    : lcd{lcd}, controlEngine{controlEngine}, controlIndoor{controlIndoor}, clockRTC{clockRTC}
 {
 }
 
@@ -9,7 +9,12 @@ MenuLCD1602::~MenuLCD1602()
 {
 }
 
-void MenuLCD1602::Initialize()
+void MenuLCD1602::clear()
+{
+    lcd->clear();
+}
+
+void MenuLCD1602::initialize()
 {
     // LCD-Character Create
     lcd->createChar(1, custom_termometr_Cool);
@@ -21,7 +26,7 @@ void MenuLCD1602::Initialize()
     lcd->createChar(6, custom_play);
     lcd->createChar(7, custom_pause);
 
-    printMainmenu();
+    printMainMenu();
 }
 
 /*
@@ -182,7 +187,7 @@ void MenuLCD1602::patternCursor(int col, int row, Control cursor)
  * Print
 */
 
-void MenuLCD1602::printMainmenu(int select)
+void MenuLCD1602::printMainMenu(int select)
 {
     // 1 Row (string)
 
@@ -326,11 +331,6 @@ void MenuLCD1602::cursorTriggerCol(int select, int col)
 
         oldSelect = select;
    // }
-}
-
-void MenuLCD1602::clear()
-{
-    lcd->clear();
 }
 
 void MenuLCD1602::printException(const char *marker, int code)

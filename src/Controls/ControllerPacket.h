@@ -22,17 +22,20 @@ private:
     int curentMenu = 0x30;
     int oldMenu = 0;
     int curentSubMenu = 0;
-    void plusSubmenu();
-    void minusSubmenu();
-    void plusTemperature();
-    void minusTemperature();
-    void set();
+    bool edit = false;
+    void navigationPlus();
+    void navigationMinus();
+    void navigationSet();
+    void submenuPlus();
+    void submenuMinus();
+    void temperaturePlus();
+    void temperatureMinus();
     void updateScreen();
-    void adapterSerial(); // For collaborate witch Serial Packet
+    void adapterSerial(int incomingByte); // For collaborate witch Serial Packet
 public:
     ControllerPacket(MenuLCD1602 *menu, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor);
     void update();
-    void update(int menu);
+    void update(int incomingByte);
 };
 
 #endif

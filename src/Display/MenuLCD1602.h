@@ -43,7 +43,7 @@ private:
     LiquidCrystal_I2C* lcd;
     ControllerEngine* controlEngine;
     ControllerIndoor* controlIndoor;
-    DS3231* rtc;
+    DS3231* clockRTC;
 
     unsigned long commonTimer;
     int oldSelect = 99;
@@ -60,17 +60,17 @@ private:
 
 public:
 
-    MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* rtc);
+    MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* clockRTC);
     ~MenuLCD1602();
 
     bool blink = false;
 
-    void Initialize();
-    void printMainmenu(int select = 0);
+    void clear();
+    void initialize();
+    void printMainMenu(int select = 0);
     void printEngineSubmenu(int select = 0);
     void printIndoorSubmenu(int select = 0);
     void printException(const char *marker, int code);
-    void clear();
 };
 
 #endif

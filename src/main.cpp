@@ -1,39 +1,51 @@
 #include "includes.h"
 
+
 /*---------------------------------------------------------*/
 /*  Global Variables                                       */
 /*---------------------------------------------------------*/
+float minTemperatureEngine = eeprom_read_float(10);// 29.6; 
+float maxTemperatureEngine = eeprom_read_float(20);// 30.6; 
+float minTemperatureIndoor = eeprom_read_float(30);// 28.0; 
+float maxTemperatureIndoor = eeprom_read_float(40);// 29.0; 
 
-SensorTypeNTC* sensorEngine = new SensorTypeNTC(29.6, 30.6, SENSOR_1);
-SensorTypeNTC* sensorIndoor = new SensorTypeNTC(28.0, 29.0, SENSOR_2);
+// Sensor
+SensorTypeNTC* sensorEngine = new SensorTypeNTC(minTemperatureEngine, maxTemperatureEngine, SENSOR_1);
+SensorTypeNTC* sensorIndoor = new SensorTypeNTC(minTemperatureIndoor, maxTemperatureIndoor, SENSOR_2);
 // SensorTypeNTC* sensorEngine = new SensorTypeNTC(50, 58, SENSOR_1);
 // SensorTypeNTC* sensorIndoor = new SensorTypeNTC(25.9, 26.6, SENSOR_2);
 
+// Driver
 Relay* relayA = new Relay(RELAY_1);
 Relay* relayB = new Relay(RELAY_2);
 // Relay* relayReserved = new Relay(RELAY_3);
 Relay* relayPumb = new Relay(RELAY_4);
 
+// Controller
 ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB);
 // ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine);
 ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb);
 
+// Clock
 DS3231* clockRTC = new DS3231();
 
-LiquidCrystal_I2C* lcd = new LiquidCrystal_I2C(0x3F, 16, 2);
-
+// Button
 ButtonTTB* buttonLeft = new ButtonTTB(BUTTON_1); 
 ButtonTTB* buttonModeSet = new ButtonTTB(BUTTON_2); 
 ButtonTTB* buttonRight = new ButtonTTB(BUTTON_3); 
 
+// Display - LED
+LiquidCrystal_I2C* lcd = new LiquidCrystal_I2C(0x3F, 16, 2);
 // DisplayLCD_Menu* display = new DisplayLCD_Menu(lcd, controlEngine, controlIndoor, buttonLeft, buttonModeSet, buttonRight, clockRTC);
 MenuLCD1602* menu = new MenuLCD1602(lcd, controlEngine, controlIndoor, clockRTC);
-ControllerPacket* ledControl = new ControllerPacket(menu, controlEngine, controlIndoor);
-
-int incomingByte = 0x30;
+ControllerPacket* controlLed = new ControllerPacket(menu, controlEngine, controlIndoor);
 
 void setup()
 {
+  // eeprom_write_float(10, 29.6); // ;
+  // eeprom_write_float(20, 30.6); // ;
+  // eeprom_write_float(30, 28.0); // ;
+  // eeprom_write_float(40, 29.0); // ;
 
   //  Debugging: Compatible Tools - avr-stub
   //  initialize GDB stub (avr-stub)
@@ -45,7 +57,7 @@ void setup()
   {
     // wait for hardware serial port to connect. Needed for Leonardo only
   }
-  Serial.println("Indoor climat control heat - Ver.2");
+  Serial.println("Indoor climat control heat - Ver.2.1");
 
   controlEngine->SetAction(ModeAction::Heat); // Режим - Нагрівання
   controlEngine->SetSwitchingDevice(ModeSwitchingDevice::TicTac); // Почергове включення нагрівачів
@@ -57,11 +69,13 @@ void setup()
   lcd->backlight();
   // lcd->clear();
 
-  menu->Initialize();
+  menu->initialize();
 }
 
 void loop()
 {
+  int incomingByte = 0x30;
+
   // controlEngine.Update();
   controlIndoor->Update();
 
@@ -75,23 +89,23 @@ void loop()
     // считываем входящий байт:
     incomingByte = Serial.read();
     Serial.println(incomingByte, DEC);
-    ledControl->update(incomingByte);
+    controlLed->update(incomingByte);
   }
   else if (buttonLeft->keyDown())
   {
-    ledControl->update(0x2B);
+    controlLed->update(0x2B);
   }
   else if (buttonRight->keyDown())
   {
-    ledControl->update(0x2D);
+    controlLed->update(0x2D);
   }
   else if (buttonModeSet->keyDown())
   {
-    ledControl->update(0x73);
+    controlLed->update(0x73);
   }
   else
   {
-    ledControl->update();
+    controlLed->update();
   }
 
   // if (incomingByte == 0x30)
@@ -127,3 +141,4 @@ void loop()
   //   toggle_led2();
   */
 }
+
