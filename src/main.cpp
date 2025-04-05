@@ -4,10 +4,10 @@
 /*---------------------------------------------------------*/
 /*  Global Variables                                       */
 /*---------------------------------------------------------*/
-float minTemperatureEngine = eeprom_read_float(10);// 29.6; 
-float maxTemperatureEngine = eeprom_read_float(20);// 30.6; 
-float minTemperatureIndoor = eeprom_read_float(30);// 28.0; 
-float maxTemperatureIndoor = eeprom_read_float(40);// 29.0; 
+float minTemperatureEngine = eeprom_read_float(EEPROM_TemperatureEngineMin);// 29.6; 
+float maxTemperatureEngine = eeprom_read_float(EEPROM_TemperatureEngineMax);// 30.6; 
+float minTemperatureIndoor = eeprom_read_float(EEPROM_TemperatureIndoorMin);// 28.0; 
+float maxTemperatureIndoor = eeprom_read_float(EEPROM_TemperatureIndoorMax);// 29.0; 
 
 // Sensor
 SensorTypeNTC* sensorEngine = new SensorTypeNTC(minTemperatureEngine, maxTemperatureEngine, SENSOR_1);
@@ -22,9 +22,11 @@ Relay* relayB = new Relay(RELAY_2);
 Relay* relayPumb = new Relay(RELAY_4);
 
 // Controller
-ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB);
+//ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB);
+ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
 // ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine);
-ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb);
+// ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb);
+ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb, EEPROM_TemperatureIndoorMin, EEPROM_TemperatureIndoorMax);
 
 // Clock
 DS3231* clockRTC = new DS3231();
@@ -36,7 +38,6 @@ ButtonTTB* buttonRight = new ButtonTTB(BUTTON_3);
 
 // Display - LED
 LiquidCrystal_I2C* lcd = new LiquidCrystal_I2C(0x3F, 16, 2);
-// DisplayLCD_Menu* display = new DisplayLCD_Menu(lcd, controlEngine, controlIndoor, buttonLeft, buttonModeSet, buttonRight, clockRTC);
 MenuLCD1602* menu = new MenuLCD1602(lcd, controlEngine, controlIndoor, clockRTC);
 ControllerPacket* controlLed = new ControllerPacket(menu, controlEngine, controlIndoor);
 
@@ -57,7 +58,7 @@ void setup()
   {
     // wait for hardware serial port to connect. Needed for Leonardo only
   }
-  Serial.println("Indoor climat control heat - Ver.2.1");
+  Serial.println("Indoor climat control heat - Ver.3.1");
 
   controlEngine->SetAction(ModeAction::Heat); // Режим - Нагрівання
   controlEngine->SetSwitchingDevice(ModeSwitchingDevice::TicTac); // Почергове включення нагрівачів
@@ -93,11 +94,11 @@ void loop()
   }
   else if (buttonLeft->keyDown())
   {
-    controlLed->update(0x2B);
+    controlLed->update(0x2D);
   }
   else if (buttonRight->keyDown())
   {
-    controlLed->update(0x2D);
+    controlLed->update(0x2B);
   }
   else if (buttonModeSet->keyDown())
   {
