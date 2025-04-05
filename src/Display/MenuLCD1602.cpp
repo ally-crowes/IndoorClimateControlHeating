@@ -299,6 +299,29 @@ void MenuLCD1602::printIndoorSubmenu(int select)
     cursorTriggerCol(select, 5);
 }
 
+void MenuLCD1602::printRTC()
+{
+    // RealTimeClock
+    bool century = false;
+    bool h12Flag;
+    bool pmFlag;
+    lcd->setCursor(0, 0);
+    lcd->print(clockRTC->getHour(h12Flag, pmFlag), DEC);
+    lcd->print(":");
+    lcd->print(clockRTC->getMinute(), DEC);
+    lcd->print(":");
+    lcd->print(clockRTC->getSecond(), DEC);
+    lcd->print(" ");
+
+    // display->setCursor(8, 1);
+    lcd->setCursor(6, 1);
+    lcd->print(clockRTC->getDate(), DEC);
+    lcd->print("-");
+    lcd->print(clockRTC->getMonth(century), DEC);
+    lcd->print("-");
+    lcd->print(clockRTC->getYear(), DEC);
+}
+
 // Set single position column for 1&2 row
 void MenuLCD1602::cursorTriggerCol(int select, int col)
 {

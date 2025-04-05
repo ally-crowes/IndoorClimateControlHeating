@@ -12,8 +12,6 @@ float maxTemperatureIndoor = eeprom_read_float(EEPROM_TemperatureIndoorMax);// 2
 // Sensor
 SensorTypeNTC* sensorEngine = new SensorTypeNTC(minTemperatureEngine, maxTemperatureEngine, SENSOR_1);
 SensorTypeNTC* sensorIndoor = new SensorTypeNTC(minTemperatureIndoor, maxTemperatureIndoor, SENSOR_2);
-// SensorTypeNTC* sensorEngine = new SensorTypeNTC(50, 58, SENSOR_1);
-// SensorTypeNTC* sensorIndoor = new SensorTypeNTC(25.9, 26.6, SENSOR_2);
 
 // Driver
 Relay* relayA = new Relay(RELAY_1);
@@ -22,10 +20,7 @@ Relay* relayB = new Relay(RELAY_2);
 Relay* relayPumb = new Relay(RELAY_4);
 
 // Controller
-//ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB);
 ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
-// ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine);
-// ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb);
 ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb, EEPROM_TemperatureIndoorMin, EEPROM_TemperatureIndoorMax);
 
 // Clock
@@ -80,11 +75,6 @@ void loop()
   // controlEngine.Update();
   controlIndoor->Update();
 
-  // display->Update();
-  // menu->printMainMenu();
-  // menu->printIndoorSubmenu();
-  // menu->printEngineSubmenu();
-
   if (Serial.available() > 0)
   {
     // считываем входящий байт:
@@ -109,37 +99,5 @@ void loop()
     controlLed->update();
   }
 
-  // if (incomingByte == 0x30)
-  // {
-  //   menu->printMainMenu();
-  // }
-  // else if (incomingByte == 0x33)
-  // {
-  //   menu->printMainMenu(1);
-  // }
-  // else if (incomingByte == 0x34)
-  // {
-  //   menu->printMainMenu(2);
-  // }
-
-  // else if (incomingByte == 0x31)
-  // {
-  //   menu->printIndoorSubmenu(0);
-  // }
-  // else if (incomingByte == 0x32)
-  // {
-  //   menu->printEngineSubmenu(0);
-  // }
-
-  /*
-  bool pin_button_flag = buttonRight->keyDown();
-  if (pin_button_flag)
-  {
-    toggle_led();
-  }
-    digitalWrite(CONTROL_PIN2, pin_button_flag);
-  // if (buttonLeft->keyDown())
-  //   toggle_led2();
-  */
 }
 

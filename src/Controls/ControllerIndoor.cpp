@@ -10,7 +10,15 @@ ControllerIndoor::ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngi
     : sensorInternal(sensorInternal), controlEngine(controlEngine)
 {
     this->pump = pump;
-}    
+}
+
+ControllerIndoor::ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngine* controlEngine, Relay* pump, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+    : sensorInternal(sensorInternal), controlEngine(controlEngine)
+{
+    this->pump = pump;
+    this->eeprom_minTemperature = eeprom_minTemperature;
+    this->eeprom_maxTemperature = eeprom_maxTemperature;
+}
 
 float ControllerIndoor::GetTemperature()
 {
@@ -146,4 +154,32 @@ unsigned long ControllerIndoor::GetDelayPumpOn()
 void ControllerIndoor::SetDelayPumpOn(unsigned long time)
 {
     delayPumpOn = time;
+}
+
+void ControllerIndoor::ChangeMinUpTemperature(float step)
+{
+    SetMinTemperature(GetMinTemperature() + step);
+    //eeprom_write_float(30, GetMinTemperature());
+    eeprom_write_float(eeprom_minTemperature, GetMinTemperature());
+}
+
+void ControllerIndoor::ChangeMinDownTemperature(float step)
+{
+    SetMinTemperature(GetMinTemperature() - step);
+    //eeprom_write_float(30, GetMinTemperature());
+    eeprom_write_float(eeprom_minTemperature, GetMinTemperature());
+}
+
+void ControllerIndoor::ChangeMaxUpTemperature(float step)
+{
+    SetMaxTemperature(GetMaxTemperature() + step);
+    // eeprom_write_float(40, GetMaxTemperature());
+    eeprom_write_float(eeprom_maxTemperature, GetMaxTemperature());
+}
+
+void ControllerIndoor::ChangeMaxDownTemperature(float step)
+{
+    SetMaxTemperature(GetMaxTemperature() - step);
+    // eeprom_write_float(40, GetMaxTemperature());
+    eeprom_write_float(eeprom_maxTemperature, GetMaxTemperature());
 }

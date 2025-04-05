@@ -70,6 +70,7 @@ public:
     void printMainMenu(int select = 0);
     void printEngineSubmenu(int select = 0);
     void printIndoorSubmenu(int select = 0);
+    void printRTC();
     void printException(const char *marker, int code);
 };
 

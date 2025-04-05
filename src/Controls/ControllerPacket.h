@@ -3,6 +3,7 @@
 #include "Display\MenuLCD1602.h"
 
 //#include "includes.h"
+// #include "..\Extensions\ControllerIndoorExtensions.h"
 
 class ControllerPacket
 {
@@ -18,6 +19,7 @@ private:
     MenuLCD1602 *menuLCD1602;
     ControllerEngine* controlEngine;
     ControllerIndoor* controlIndoor;
+    // ControllerIndoorExtensions* controlIndoorExt;
 
     int curentMenu = 0x30;
     int oldMenu = 0;

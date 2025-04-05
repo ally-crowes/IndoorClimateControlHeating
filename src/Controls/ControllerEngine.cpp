@@ -10,12 +10,19 @@ ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* 
 }
 
 ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB)
-                : ControllerEngine(sensor, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac)
+    : ControllerEngine(sensor, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac)
 {}
 
 ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relay, ModeAction action) 
-                : ControllerEngine(sensor, relay, new Relay(255), ModeAction::Heat, ModeSwitchingDevice::FirstOnly)
+    : ControllerEngine(sensor, relay, new Relay(255), ModeAction::Heat, ModeSwitchingDevice::FirstOnly)
 {}
+
+ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+    : ControllerEngine(sensor, relayA, relayB, action, switching)
+{
+    this->eeprom_minTemperature = eeprom_minTemperature;
+    this->eeprom_maxTemperature = eeprom_maxTemperature;
+}
 
 ModeAction ControllerEngine::GetAction() const
 {
@@ -194,4 +201,32 @@ float ControllerEngine::GetMaxTemperature()
 void ControllerEngine::SetMaxTemperature(float max)
 {
     sensorEngine->SetMax(max);
+}
+
+void ControllerEngine::ChangeMinUpTemperature(float step)
+{
+    SetMinTemperature(GetMinTemperature() + step);
+    //eeprom_write_float(10, GetMinTemperature());
+    eeprom_write_float(eeprom_minTemperature, GetMinTemperature());
+}
+
+void ControllerEngine::ChangeMinDownTemperature(float step)
+{
+    SetMinTemperature(GetMinTemperature() - step);
+    //eeprom_write_float(10, GetMinTemperature());
+    eeprom_write_float(eeprom_minTemperature, GetMinTemperature());
+}
+
+void ControllerEngine::ChangeMaxUpTemperature(float step)
+{
+    SetMaxTemperature(GetMaxTemperature() + step);
+    // eeprom_write_float(20, GetMaxTemperature());
+    eeprom_write_float(eeprom_maxTemperature, GetMaxTemperature());
+}
+
+void ControllerEngine::ChangeMaxDownTemperature(float step)
+{
+    SetMaxTemperature(GetMaxTemperature() - step);
+    // eeprom_write_float(20, GetMaxTemperature());
+    eeprom_write_float(eeprom_maxTemperature, GetMaxTemperature());
 }

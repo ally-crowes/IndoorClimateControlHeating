@@ -72,7 +72,6 @@ void ControllerPacket::navigationPlus()
   {
     submenuPlus();
   }
-  //if (curentMenu == 0x39 || curentMenu == 0x40 )
   else if ( curentMenu == 0x31 || curentMenu == 0x32 )
   {
     temperaturePlus();
@@ -85,7 +84,6 @@ void ControllerPacket::navigationMinus()
   {
     submenuMinus();
   }
-  //if (curentMenu == 0x39 || curentMenu == 0x40)
   else if (curentMenu == 0x31 || curentMenu == 0x32 )
   {
     temperatureMinus();
@@ -97,8 +95,9 @@ void ControllerPacket::navigationSet()
   switch (curentMenu)
   {
   case 0x30:
-    if (curentSubMenu == 1) { curentMenu = 0x31; curentSubMenu = 0; }
-    if (curentSubMenu == 2) { curentMenu = 0x32; curentSubMenu = 0; }
+    if (curentSubMenu == 0) { curentMenu = 0x72; }
+    else if (curentSubMenu == 1) { curentMenu = 0x31; curentSubMenu = 0; }
+    else if (curentSubMenu == 2) { curentMenu = 0x32; curentSubMenu = 0; }
     break;
   case 0x31: // Indoor
     if (curentSubMenu == 0) { curentMenu = 0x30; }
@@ -117,6 +116,10 @@ void ControllerPacket::navigationSet()
   case 0x71: // q
     menuLCD1602->blink = true;
     break;
+  case 0x72: // RTC
+    curentMenu = 0x30;
+    break;
+  
   
   default:
     menuLCD1602->printException(errorNames[2], curentMenu);
@@ -126,28 +129,28 @@ void ControllerPacket::navigationSet()
 
 }
 
-void ControllerPacket::submenuPlus()
+void ControllerPacket::submenuMinus()
 {
   switch (curentSubMenu)
   {
-  case 0:
+    case 0:
     curentSubMenu++;
     break;
-  case 1:
+    case 1:
     curentSubMenu++;
     break;
-  case 2:
+    case 2:
     curentSubMenu = 0;
     break;
-  
+    
   default:
-    break;
+  break;
   }
-
+  
   updateScreen();
 }
 
-void ControllerPacket::submenuMinus()
+void ControllerPacket::submenuPlus()
 {
   switch (curentSubMenu)
   {
@@ -174,40 +177,29 @@ void ControllerPacket::temperaturePlus()
 
   switch (curentMenu)
   {
-  //case 0x39:
   case 0x31:
     if (curentSubMenu == 1)
     {
-      plus = controlIndoor->GetMinTemperature();
-      controlIndoor->SetMinTemperature(plus + 0.1);
-      eeprom_write_float(30, controlIndoor->GetMinTemperature());
-      Serial.print(" indoorMin+");
+      controlIndoor->ChangeMinUpTemperature();
+      //controlIndoorExt->temperatureChangeMinUp();
     }
     else if (curentSubMenu == 2)
     {
-      plus = controlIndoor->GetMaxTemperature();
-      controlIndoor->SetMaxTemperature(plus + 0.1);
-      eeprom_write_float(40, controlIndoor->GetMaxTemperature());
-      Serial.print(" indoorMax+");
+      controlIndoor->ChangeMaxUpTemperature();
+      // controlIndoorExt->temperatureChangeMaxUp();
     }
     break;
   case 0x32:
     if (curentSubMenu == 1)
     {
-      plus = controlEngine->GetMinTemperature();
-      controlEngine->SetMinTemperature(plus + 0.1);
-      eeprom_write_float(10, controlEngine->GetMinTemperature());
-      Serial.print(" engineMin-");
+      controlEngine->ChangeMinUpTemperature();
     }
     else if (curentSubMenu == 2)
     {
-      plus = controlEngine->GetMaxTemperature();
-      controlEngine->SetMaxTemperature(plus + 0.1);
-      eeprom_write_float(20, controlEngine->GetMaxTemperature());
-      Serial.print(" engineMin-");
+      controlEngine->ChangeMaxUpTemperature();
     }
     break;
-
+    
   default:
     break;
   }
@@ -218,39 +210,29 @@ void ControllerPacket::temperaturePlus()
 void ControllerPacket::temperatureMinus()
 {
   float minus = 0;
-
+  
   switch (curentMenu)
   {
-  case 0x31:
+    case 0x31:
     if (curentSubMenu == 1)
     {
-      minus = controlIndoor->GetMinTemperature();
-      controlIndoor->SetMinTemperature(minus - 0.1);
-      eeprom_write_float(30, controlIndoor->GetMinTemperature());
-      Serial.print(" minus1-");
+      controlIndoor->ChangeMinDownTemperature();
+      // controlIndoorExt->temperatureChangeMinDown();
     }
     else if (curentSubMenu == 2)
     {
-      minus = controlIndoor->GetMaxTemperature();
-      controlIndoor->SetMaxTemperature(minus - 0.1);
-      eeprom_write_float(40, controlIndoor->GetMaxTemperature());
-      Serial.print(" minus2-");
+      controlIndoor->ChangeMaxDownTemperature();
+      // controlIndoorExt->temperatureChangeMaxDown();
     }
     break;
   case 0x32:
     if (curentSubMenu == 1)
     {
-      minus = controlEngine->GetMinTemperature();
-      controlEngine->SetMinTemperature(minus - 0.1);
-      eeprom_write_float(10, controlEngine->GetMinTemperature());
-      Serial.print(" minus1-");
+      controlEngine->ChangeMinDownTemperature();
     }
     else if (curentSubMenu == 2)
     {
-      minus = controlEngine->GetMaxTemperature();
-      controlEngine->SetMaxTemperature(minus - 0.1);
-      eeprom_write_float(20, controlEngine->GetMaxTemperature());
-      Serial.print(" minus2-");
+      controlEngine->ChangeMaxDownTemperature();
     }
     break;
 
@@ -296,6 +278,10 @@ void ControllerPacket::adapterSerial(int incomingByte)
   case 0x71: // 'q'
     //curentMenu = 0x40; curentSubMenu = 0;
     break;
+  case 0x72: // 'r'
+    curentMenu = 0x72; curentSubMenu = 0;
+    break;
+  
 
   default:
     menuLCD1602->printException(errorNames[3], curentMenu);
@@ -318,16 +304,18 @@ void ControllerPacket::updateScreen()
     menuLCD1602->printEngineSubmenu(curentSubMenu);
     break;
   case 0x39:
-    //menuLCD1602->printEngineSubmenu(curentSubMenu, MenuLCD1602::MenuCondition::TempMinEngine);
     menuLCD1602->printIndoorSubmenu(curentSubMenu);
     break;
   case 0x40:
-    //menuLCD1602->printEngineSubmenu(curentSubMenu, MenuLCD1602::MenuCondition::TempMinEngine);
     menuLCD1602->printEngineSubmenu(curentSubMenu);
     break;
   case 0x71: // q
     menuLCD1602->printException(errorNames[5], curentMenu);// delay(2000); 
     break;
+  case 0x72: // 'r'
+    menuLCD1602->printRTC();
+    break;
+  
 
   default:
     menuLCD1602->printException(errorNames[1], curentMenu);

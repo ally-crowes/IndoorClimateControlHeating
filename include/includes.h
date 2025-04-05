@@ -65,6 +65,15 @@
 #define NOTINUNO_1    A6
 #define NOTINUNO_1    A6
 
+/*
+ * Map EEPROM Nano
+ */
+#define EEPROM_TemperatureEngineMin (float*)10
+#define EEPROM_TemperatureEngineMax (float*)20
+#define EEPROM_TemperatureIndoorMin (float*)30
+#define EEPROM_TemperatureIndoorMax (float*)40
+
+
 // I2C (TWI) - Led display: LCD1602_I2C-pcf8574
 //             Real-time clock (RTC) : DS3231 + flash AT24C32
 // SPI - CD card: HW-203
