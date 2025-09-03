@@ -1,7 +1,5 @@
 #include "ControllerPacket.h"
 
-// Pattern State
-
 const char *errorNames[] = {
         "update",       // 0
         "updateScreen", // 1
