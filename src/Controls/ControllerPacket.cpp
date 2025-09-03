@@ -1,5 +1,7 @@
 #include "ControllerPacket.h"
 
+// Pattern State
+
 const char *errorNames[] = {
         "update",       // 0
         "updateScreen", // 1
@@ -37,15 +39,7 @@ void ControllerPacket::update(int incomingByte)
     oldMenu = incomingByte;
     break;
 
-  default:  // other incoming byte
-    //menuLCD1602->printException(errorNames[0], curentMenu);
-        
-    // if (oldMenu != incomingByte)
-    // {
-    //   adapterSerial();
-    //   menuLCD1602->clear();
-    // }
-    
+  default: 
     adapterSerial(incomingByte);
     menuLCD1602->clear();
     oldMenu = incomingByte;
@@ -120,13 +114,11 @@ void ControllerPacket::navigationSet()
     curentMenu = 0x30;
     break;
   
-  
   default:
     menuLCD1602->printException(errorNames[2], curentMenu);
     delay(2000);
     break;
   }
-
 }
 
 void ControllerPacket::submenuMinus()
@@ -301,12 +293,6 @@ void ControllerPacket::updateScreen()
     menuLCD1602->printIndoorSubmenu(curentSubMenu);
     break;
   case 0x32:
-    menuLCD1602->printEngineSubmenu(curentSubMenu);
-    break;
-  case 0x39:
-    menuLCD1602->printIndoorSubmenu(curentSubMenu);
-    break;
-  case 0x40:
     menuLCD1602->printEngineSubmenu(curentSubMenu);
     break;
   case 0x71: // q
