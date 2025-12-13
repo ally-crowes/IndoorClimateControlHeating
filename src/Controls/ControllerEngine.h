@@ -53,10 +53,10 @@ protected:
     float* eeprom_maxTemperature;
 
 public:
-    ControllerEngine(SensorTypeNTC *sensor, Relay *relay, ModeAction action);
+    //ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature);
+    ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature);
     ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB);
-    ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB, ModeAction action, ModeSwitchingDevice switching);
-    ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature);
+    ControllerEngine(SensorTypeNTC *sensor, Relay *relay, ModeAction action);
     
     ModeAction GetAction() const;
     void SetAction(ModeAction action);
@@ -79,6 +79,7 @@ public:
     void ChangeMinDownTemperature(float step = 0.1);
     void ChangeMaxUpTemperature(float step = 0.1);
     void ChangeMaxDownTemperature(float step = 0.1);
+
 };
 
 #endif

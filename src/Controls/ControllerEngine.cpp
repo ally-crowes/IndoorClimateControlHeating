@@ -1,28 +1,36 @@
 #include "ControllerEngine.h"
 
-ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching)
+//ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching)
+//ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+// {
+//     this->action = action;
+//     this->switching = switching;
+// }
+
+// ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+//     : ControllerEngine(sensor, relayA, relayB, action, switching)
+// {
+//     this->eeprom_minTemperature = eeprom_minTemperature;
+//     this->eeprom_maxTemperature = eeprom_maxTemperature;
+// }
+
+ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature)
 {
     this->sensorEngine = sensor;
     this->relayA = relayA;
     this->relayB = relayB;
-    this->action = action;
-    this->switching = switching;
-}
-
-ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB)
-    : ControllerEngine(sensor, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac)
-{}
-
-ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relay, ModeAction action) 
-    : ControllerEngine(sensor, relay, new Relay(255), ModeAction::Heat, ModeSwitchingDevice::FirstOnly)
-{}
-
-ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
-    : ControllerEngine(sensor, relayA, relayB, action, switching)
-{
     this->eeprom_minTemperature = eeprom_minTemperature;
     this->eeprom_maxTemperature = eeprom_maxTemperature;
 }
+
+ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB)
+//: ControllerEngine(sensor, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac)
+{}
+
+ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relay, ModeAction action) 
+//    : ControllerEngine(sensor, relay, new Relay(255), ModeAction::Heat, ModeSwitchingDevice::FirstOnly)
+{}
+
 
 ModeAction ControllerEngine::GetAction() const
 {

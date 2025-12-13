@@ -20,7 +20,8 @@ Relay* relayB = new Relay(RELAY_2);
 Relay* relayPumb = new Relay(RELAY_4);
 
 // Controller
-ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
+//ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::Parallel, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
+ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
 ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb, EEPROM_TemperatureIndoorMin, EEPROM_TemperatureIndoorMax);
 
 // Clock
@@ -38,10 +39,10 @@ ControllerPacket* controlLed = new ControllerPacket(menu, controlEngine, control
 
 void setup()
 {
-  // eeprom_write_float(10, 29.6); // ;
-  // eeprom_write_float(20, 30.6); // ;
-  // eeprom_write_float(30, 28.0); // ;
-  // eeprom_write_float(40, 29.0); // ;
+  eeprom_write_float(10, 29.6); // ;
+  eeprom_write_float(20, 30.6); // ;
+  eeprom_write_float(30, 28.0); // ;
+  eeprom_write_float(40, 29.0); // ;
 
   //  Debugging: Compatible Tools - avr-stub
   //  initialize GDB stub (avr-stub)
@@ -56,7 +57,7 @@ void setup()
   Serial.println("Indoor climat control heat - Ver.3.1");
 
   controlEngine->SetAction(ModeAction::Heat); // Режим - Нагрівання
-  controlEngine->SetSwitchingDevice(ModeSwitchingDevice::TicTac); // Почергове включення нагрівачів
+  controlEngine->SetSwitchingDevice(ModeSwitchingDevice::Parallel); // Почергове включення нагрівачів
   controlIndoor->SetConditionPump(true); // Увімкнути насос
   controlIndoor->SetDelayPumpOn(4000);   // Затримка увимкненям нагрівачів після увімкниням насосу
   controlIndoor->SetDelayPumpOff(10000); // Затримка перед вимкненям насосу після повного нагріву кімнат
