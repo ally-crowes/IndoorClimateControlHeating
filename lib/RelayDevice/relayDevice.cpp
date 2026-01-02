@@ -1,23 +1,25 @@
-#include "Relay.h"
+#include <Arduino.h>
 
-Relay::Relay(int pin) : pin {pin}
+#include "relayDevice.h"
+
+RelayDevice::RelayDevice(int pin) : pin {pin}
 {
     pinMode(pin, OUTPUT);
     ToggleCondition(false);
 }
 
-bool Relay::GetCondition()
+bool RelayDevice::getCondition()
 {
     return this->status;
 }
 
-void Relay::SetCondition(bool status)
+void RelayDevice::setCondition(bool status)
 {
     this->status = status;
     ToggleCondition(status);
 }
 
-void Relay::ToggleCondition(bool status)
+void RelayDevice::ToggleCondition(bool status)
 {
     if (status)
     {
@@ -28,7 +30,7 @@ void Relay::ToggleCondition(bool status)
         digitalWrite(pin, LOW);
 }
 
-unsigned int Relay::GetCount()
+unsigned int RelayDevice::getCount()
 {
     return count;
 }

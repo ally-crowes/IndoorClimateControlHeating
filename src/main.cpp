@@ -14,10 +14,10 @@ SensorTypeNTC* sensorEngine = new SensorTypeNTC(minTemperatureEngine, maxTempera
 SensorTypeNTC* sensorIndoor = new SensorTypeNTC(minTemperatureIndoor, maxTemperatureIndoor, SENSOR_2);
 
 // Driver
-Relay* relayA = new Relay(RELAY_1);
-Relay* relayB = new Relay(RELAY_2);
+RelayDevice* relayA = new RelayDevice(RELAY_1);
+RelayDevice* relayB = new RelayDevice(RELAY_2);
 // Relay* relayReserved = new Relay(RELAY_3);
-Relay* relayPumb = new Relay(RELAY_4);
+RelayDevice* relayPumb = new RelayDevice(RELAY_4);
 
 // Controller
 //ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::Parallel, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
@@ -39,10 +39,10 @@ ControllerPacket* controlLed = new ControllerPacket(menu, controlEngine, control
 
 void setup()
 {
-  eeprom_write_float(10, 29.6); // ;
-  eeprom_write_float(20, 30.6); // ;
-  eeprom_write_float(30, 28.0); // ;
-  eeprom_write_float(40, 29.0); // ;
+  // eeprom_write_float(EEPROM_TemperatureEngineMin, 29.6); // #default value
+  // eeprom_write_float(EEPROM_TemperatureEngineMax, 30.6); // #default value
+  // eeprom_write_float(EEPROM_TemperatureIndoorMin, 28.0); // #default value
+  // eeprom_write_float(EEPROM_TemperatureIndoorMax, 29.0); // #default value
 
   //  Debugging: Compatible Tools - avr-stub
   //  initialize GDB stub (avr-stub)
@@ -56,11 +56,11 @@ void setup()
   }
   Serial.println("Indoor climat control heat - Ver.3.1");
 
-  controlEngine->SetAction(ModeAction::Heat); // Режим - Нагрівання
-  controlEngine->SetSwitchingDevice(ModeSwitchingDevice::Parallel); // Почергове включення нагрівачів
-  controlIndoor->SetConditionPump(true); // Увімкнути насос
-  controlIndoor->SetDelayPumpOn(4000);   // Затримка увимкненям нагрівачів після увімкниням насосу
-  controlIndoor->SetDelayPumpOff(10000); // Затримка перед вимкненям насосу після повного нагріву кімнат
+  controlEngine->setAction(ModeAction::Heat); // Режим - Нагрівання
+  controlEngine->setSwitchingDevice(ModeSwitchingDevice::Parallel); // Почергове включення нагрівачів
+  controlIndoor->setConditionPump(true); // Увімкнути насос
+  controlIndoor->setDelayPumpOn(4000);   // Затримка увимкненям нагрівачів після увімкниням насосу
+  controlIndoor->setDelayPumpOff(10000); // Затримка перед вимкненям насосу після повного нагріву кімнат
 
   lcd->init();
   lcd->backlight();
@@ -71,13 +71,13 @@ void setup()
 
 void loop()
 {
-  int incomingByte = 0x30;
-
+  
   // controlEngine.Update();
-  controlIndoor->Update();
-
+  controlIndoor->update();
+  
   if (Serial.available() > 0)
   {
+    int incomingByte;
     // считываем входящий байт:
     incomingByte = Serial.read();
     Serial.println(incomingByte, DEC);

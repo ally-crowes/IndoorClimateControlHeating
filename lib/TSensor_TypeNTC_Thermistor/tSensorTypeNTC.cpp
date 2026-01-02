@@ -1,4 +1,8 @@
-#include "SensorTypeNTC.h"
+#include <Arduino.h>
+//#include "b3380.h"
+#include "adc2tempC_NTCschA.h"
+
+#include "tSensorTypeNTC.h"
 
 SensorTypeNTC::SensorTypeNTC(float min, float max, int pin)
 {
@@ -8,27 +12,27 @@ SensorTypeNTC::SensorTypeNTC(float min, float max, int pin)
     pinMode(pin, INPUT);
 }
 
-float SensorTypeNTC::GetMin() const
+const float SensorTypeNTC::getMin() const
 {
     return this->min;
 }
 
-void SensorTypeNTC::SetMin(float min)
+void SensorTypeNTC::setMin(float min)
 {
     this->min = min >= this->max ? this->max - 0.1f : min;
 }
 
-float SensorTypeNTC::GetMax() const
+const float SensorTypeNTC::getMax() const
 {
     return this->max;
 }
 
-void SensorTypeNTC::SetMax(float max)
+void SensorTypeNTC::setMax(float max)
 {
     this->max = max <= this->min ? this->min + 0.1f : max;
 }
 
-float SensorTypeNTC::GetTemperature()
+float SensorTypeNTC::getTemperature()
 {
     // Average value
     int average = 0;
@@ -36,7 +40,7 @@ float SensorTypeNTC::GetTemperature()
         average += analogRead(pin);
     average /= 10;
 
-    //return (calculateNTC(average) / 10.0);
-    // return getCalcNTCTemperature(average, 3380);
-    return getCalcNTCTemperature(average, 3900);
+    // return (CalculateNTC(average) / 10.0);
+    // return adc2tempC_NTCschA(average, 3380);
+    return adc2tempC_NTCschA(average, 3900);
 }

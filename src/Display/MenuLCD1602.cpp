@@ -1,4 +1,4 @@
-#include "MenuLCD1602.h"
+#include "menuLCD1602.h"
 
 MenuLCD1602::MenuLCD1602(LiquidCrystal_I2C* lcd, ControllerEngine* controlEngine, ControllerIndoor* controlIndoor, DS3231* clockRTC)
     : lcd{lcd}, controlEngine{controlEngine}, controlIndoor{controlIndoor}, clockRTC{clockRTC}
@@ -38,7 +38,7 @@ void MenuLCD1602::conditionObjectIndoor(int col, int row)
     lcd->setCursor(col, row);
 
     // Climate Condition
-    if (controlIndoor->GetCondition())
+    if (controlIndoor->getCondition())
     {
         lcd->print(char(1)); // Working
     }
@@ -53,14 +53,14 @@ void MenuLCD1602::conditionObjectEngine(int col, int row)
     lcd->setCursor(col, row);
 
     // Climate Condition
-    if (!controlIndoor->GetCondition())
+    if (!controlIndoor->getCondition())
     {
         lcd->print(char(7)); // Skip controlEngine
     }
     else
     {
         // Engine Condition
-        if (controlEngine->GetCondition())
+        if (controlEngine->getCondition())
         {
             lcd->print(char(1)); // Working
         }
@@ -76,7 +76,7 @@ void MenuLCD1602::conditionRelayEngine(int col, int row)
     lcd->setCursor(col, row);
 
     // Engine RelayA
-    if (controlEngine->GetConditionRelay(1))
+    if (controlEngine->getConditionRelay(1))
     {
         lcd->print(char(6)); // Working
     }
@@ -87,7 +87,7 @@ void MenuLCD1602::conditionRelayEngine(int col, int row)
     }
     
     // Engine RelayB status
-    if (controlEngine->GetConditionRelay(2))
+    if (controlEngine->getConditionRelay(2))
     {
         lcd->print(char(6)); // Working
     }
@@ -103,7 +103,7 @@ void MenuLCD1602::conditionRelayIndoor(int col, int row)
     lcd->setCursor(col, row);
 
     // Climate Pump
-    if (controlIndoor->GetConditionPump())
+    if (controlIndoor->getConditionPump())
     {
         lcd->print(char(6)); // Working
     }
@@ -120,11 +120,11 @@ void MenuLCD1602::patternTemperature(int col, int row, Screen screen, bool visab
 
     if (screen == ScreenEngine)
     {
-        lcd->print(controlEngine->GetTemperature());
+        lcd->print(controlEngine->getTemperature());
     }
     else
     {
-        lcd->print(controlIndoor->GetTemperature());
+        lcd->print(controlIndoor->getTemperature());
     }
 
     if (visableChar)
@@ -141,11 +141,11 @@ void MenuLCD1602::patternTemperatureMin(int col, int row, Screen screen)
 
     if (screen == ScreenEngine)
     {
-        lcd->print(controlEngine->GetMinTemperature());
+        lcd->print(controlEngine->getMinTemperature());
     }
     else
     {
-        lcd->print(controlIndoor->GetMinTemperature());
+        lcd->print(controlIndoor->getMinTemperature());
     }
 
     lcd->write(223);
@@ -159,11 +159,11 @@ void MenuLCD1602::patternTemperatureMax(int col, int row, Screen screen)
 
     if (screen == ScreenEngine)
     {
-        lcd->print(controlEngine->GetMaxTemperature());
+        lcd->print(controlEngine->getMaxTemperature());
     }
     else
     {
-        lcd->print(controlIndoor->GetMaxTemperature());
+        lcd->print(controlIndoor->getMaxTemperature());
     }
 
     lcd->write(223);

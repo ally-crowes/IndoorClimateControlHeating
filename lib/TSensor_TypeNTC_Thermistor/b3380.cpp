@@ -1,8 +1,12 @@
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+#include <inttypes.h>
+
 #include "b3380.h"
 
 // Функция вычисляет значение температуры в десятых долях градусов Цельсия
 // в зависимости от значения АЦП.
-int16_t calculateNTC(temperature_table_entry_type adcValue) {
+int16_t CalculateNTC(temperature_table_entry_type adcValue) {
   temperature_table_index_type l = 0;
   temperature_table_index_type r = (sizeof(termo_table) / sizeof(termo_table[0])) - 1;
   temperature_table_entry_type tHigh = TEMPERATURE_TABLE_READ(r);

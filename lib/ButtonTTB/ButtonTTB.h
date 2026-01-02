@@ -1,7 +1,7 @@
 #ifndef __BUTTON_TTB_H__
 #define __BUTTON_TTB_H__
 
-//  Timer Terminated Bounce  
+//  Button based of Timer Terminated Bounce
 class ButtonTTB
 {
 private:

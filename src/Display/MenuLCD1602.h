@@ -4,8 +4,8 @@
 //#include "includes.h"
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
-#include "Controls\ControllerEngine.h"
-#include "Controls\ControllerIndoor.h"
+#include "Controls\controllerEngine.h"
+#include "Controls\controllerIndoor.h"
 #include <DS3231.h>
 
 class MenuLCD1602

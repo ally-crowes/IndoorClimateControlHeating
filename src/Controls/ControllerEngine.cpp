@@ -1,7 +1,9 @@
-#include "ControllerEngine.h"
+#include <Arduino.h>
 
-//ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching)
-//ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+#include "controllerEngine.h"
+
+// ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching)
+// ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
 // {
 //     this->action = action;
 //     this->switching = switching;
@@ -14,7 +16,7 @@
 //     this->eeprom_maxTemperature = eeprom_maxTemperature;
 // }
 
-ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, RelayDevice* relayA, RelayDevice* relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature)
 {
     this->sensorEngine = sensor;
     this->relayA = relayA;
@@ -23,88 +25,18 @@ ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* 
     this->eeprom_maxTemperature = eeprom_maxTemperature;
 }
 
+/* TODO
 ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB)
 //: ControllerEngine(sensor, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::TicTac)
 {}
 
 ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relay, ModeAction action) 
-//    : ControllerEngine(sensor, relay, new Relay(255), ModeAction::Heat, ModeSwitchingDevice::FirstOnly)
+//: ControllerEngine(sensor, relay, new Relay(255), ModeAction::Heat, ModeSwitchingDevice::FirstOnly)
 {}
+*/
 
 
-ModeAction ControllerEngine::GetAction() const
-{
-    return this->action;
-}
-
-void ControllerEngine::SetAction(ModeAction action)
-{
-    this->action = action;
-}
-
-ModeSwitchingDevice ControllerEngine::GetSwitchingDevice() const
-{
-    return this->switching;
-}
-
-void ControllerEngine::SetSwitchingDevice(ModeSwitchingDevice switching)
-{
-    this->switching = switching;
-}
-
-
-float ControllerEngine::GetTemperature()
-{
-    return sensorEngine->GetTemperature();
-}
-
-void ControllerEngine::Update()
-{
-    float temperatureCurent = GetTemperature();
-
-    switch (action)
-    {
-    case ModeAction::Heat:
-        if (flagDriversWait == false)
-        {
-            if (temperatureCurent <= sensorEngine->GetMax())
-                RelaysOn();
-            else
-                RelaysOff();
-        }
-        else if (temperatureCurent <= sensorEngine->GetMin())
-        {
-            flagDriversWait = false;
-        }
-        break;
-
-    case ModeAction::Coll:
-        if (flagDriversWait == false)
-        {
-            if (temperatureCurent >= sensorEngine->GetMin())
-                RelaysOn();
-            else
-                RelaysOff();
-        }
-        else if (temperatureCurent >= sensorEngine->GetMax())
-        {
-            flagDriversWait = false;
-        }
-        break;
-
-    case ModeAction::RangeMatch:
-        if (temperatureCurent <= sensorEngine->GetMax() && temperatureCurent >= sensorEngine->GetMin())
-            RelaysOn();
-        else
-            RelaysOff();
-        break;
-
-    default:
-        break;
-    }
-}
-
-void ControllerEngine::RelaysOn()
+void ControllerEngine::relaysOn()
 {
     if (flagRelay == false)
     {
@@ -113,32 +45,32 @@ void ControllerEngine::RelaysOn()
         switch (switching)
         {
         case ModeSwitchingDevice::FirstOnly:
-            relayA->SetCondition(true);
-            relayB->SetCondition(false);
+            relayA->setCondition(true);
+            relayB->setCondition(false);
             break;
 
         case ModeSwitchingDevice::SecondOnly:
-            relayA->SetCondition(false);
-            relayB->SetCondition(true);
+            relayA->setCondition(false);
+            relayB->setCondition(true);
             break;
 
         case ModeSwitchingDevice::TicTac:
             if (count % 2)
             {
-                relayA->SetCondition(true);
-                relayB->SetCondition(false);
+                relayA->setCondition(true);
+                relayB->setCondition(false);
             }
             else
             {
-                relayA->SetCondition(false);
-                relayB->SetCondition(true);
+                relayA->setCondition(false);
+                relayB->setCondition(true);
             }
             count++;
             break;
 
         case ModeSwitchingDevice::Parallel:
-            relayA->SetCondition(true);
-            relayB->SetCondition(true);
+            relayA->setCondition(true);
+            relayB->setCondition(true);
             break;
 
         default:
@@ -147,94 +79,165 @@ void ControllerEngine::RelaysOn()
     }
 }
 
-void ControllerEngine::RelaysOff()
+void ControllerEngine::relaysOff()
 {
     if (flagDriversWait == false)
     {
-        relayA->SetCondition(false);
-        relayB->SetCondition(false);
+        relayA->setCondition(false);
+        relayB->setCondition(false);
 
         flagRelay = false;
         flagDriversWait = true;
     }
 }
 
-unsigned int ControllerEngine::GetCount()
+ModeAction ControllerEngine::getAction() const
+{
+    return this->action;
+}
+
+void ControllerEngine::setAction(ModeAction action)
+{
+    this->action = action;
+}
+
+ModeSwitchingDevice ControllerEngine::getSwitchingDevice() const
+{
+    return this->switching;
+}
+
+void ControllerEngine::setSwitchingDevice(ModeSwitchingDevice switching)
+{
+    this->switching = switching;
+}
+
+float ControllerEngine::getTemperature()
+{
+    return sensorEngine->getTemperature();
+}
+
+void ControllerEngine::update()
+{
+    float temperatureCurent = getTemperature();
+
+    switch (action)
+    {
+    case ModeAction::Heat:
+        if (flagDriversWait == false)
+        {
+            if (temperatureCurent <= sensorEngine->getMax())
+                relaysOn();
+            else
+                relaysOff();
+        }
+        else if (temperatureCurent <= sensorEngine->getMin())
+        {
+            flagDriversWait = false;
+        }
+        break;
+
+    case ModeAction::Coll:
+        if (flagDriversWait == false)
+        {
+            if (temperatureCurent >= sensorEngine->getMin())
+                relaysOn();
+            else
+                relaysOff();
+        }
+        else if (temperatureCurent >= sensorEngine->getMax())
+        {
+            flagDriversWait = false;
+        }
+        break;
+
+    case ModeAction::RangeMatch:
+        if (temperatureCurent <= sensorEngine->getMax() && temperatureCurent >= sensorEngine->getMin())
+            relaysOn();
+        else
+            relaysOff();
+        break;
+
+    default:
+        break;
+    }
+}
+
+unsigned int ControllerEngine::getCount()
 {
     return count;
 }
 
-void ControllerEngine::Wait()
+void ControllerEngine::wait()
 {
-    RelaysOff();
+    relaysOff();
 }
 
-bool ControllerEngine::GetConditionRelay(int n)
+bool ControllerEngine::getConditionRelay(int n)
 {
     bool result;
 
     if (n > 1)
     {
-        result = relayB->GetCondition();
+        result = relayB->getCondition();
     }
     else
     {
-        result = relayA->GetCondition();
+        result = relayA->getCondition();
     }
 
     return result;
 }
 
-bool ControllerEngine::GetCondition()
+bool ControllerEngine::getCondition()
 {
     // return (!relayA->GetCondition() && !relayB->GetCondition()) ? false : true;
     return !flagDriversWait;
 }
 
-float ControllerEngine::GetMinTemperature()
+float ControllerEngine::getMinTemperature()
 {
-    return sensorEngine->GetMin();
+    return sensorEngine->getMin();
 }
 
-void ControllerEngine::SetMinTemperature(float min)
+void ControllerEngine::setMinTemperature(float min)
 {
-    sensorEngine->SetMin(min);
+    sensorEngine->setMin(min);
 }
 
-float ControllerEngine::GetMaxTemperature()
+float ControllerEngine::getMaxTemperature()
 {
-    return sensorEngine->GetMax();
+    return sensorEngine->getMax();
 }
 
-void ControllerEngine::SetMaxTemperature(float max)
+void ControllerEngine::setMaxTemperature(float max)
 {
-    sensorEngine->SetMax(max);
+    sensorEngine->setMax(max);
 }
 
-void ControllerEngine::ChangeMinUpTemperature(float step)
+void ControllerEngine::changeMinUpTemperature(float step)
 {
-    SetMinTemperature(GetMinTemperature() + step);
+    setMinTemperature(getMinTemperature() + step);
     //eeprom_write_float(10, GetMinTemperature());
-    eeprom_write_float(eeprom_minTemperature, GetMinTemperature());
+    eeprom_write_float(eeprom_minTemperature, getMinTemperature());
 }
 
-void ControllerEngine::ChangeMinDownTemperature(float step)
+void ControllerEngine::changeMinDownTemperature(float step)
 {
-    SetMinTemperature(GetMinTemperature() - step);
+    setMinTemperature(getMinTemperature() - step);
     //eeprom_write_float(10, GetMinTemperature());
-    eeprom_write_float(eeprom_minTemperature, GetMinTemperature());
+    eeprom_write_float(eeprom_minTemperature, getMinTemperature());
 }
 
-void ControllerEngine::ChangeMaxUpTemperature(float step)
+void ControllerEngine::changeMaxUpTemperature(float step)
 {
-    SetMaxTemperature(GetMaxTemperature() + step);
+    setMaxTemperature(getMaxTemperature() + step);
     // eeprom_write_float(20, GetMaxTemperature());
-    eeprom_write_float(eeprom_maxTemperature, GetMaxTemperature());
+    eeprom_write_float(eeprom_maxTemperature, getMaxTemperature());
 }
 
-void ControllerEngine::ChangeMaxDownTemperature(float step)
+void ControllerEngine::changeMaxDownTemperature(float step)
 {
-    SetMaxTemperature(GetMaxTemperature() - step);
+    setMaxTemperature(getMaxTemperature() - step);
     // eeprom_write_float(20, GetMaxTemperature());
-    eeprom_write_float(eeprom_maxTemperature, GetMaxTemperature());
+    eeprom_write_float(eeprom_maxTemperature, getMaxTemperature());
 }

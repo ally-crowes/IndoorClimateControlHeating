@@ -1,7 +1,3 @@
-#include <avr/io.h>
-#include <avr/pgmspace.h>
-#include <inttypes.h>
-
 /*
  * PROGRAM NAME:  b3380
  *
@@ -79,4 +75,4 @@ const temperature_table_entry_type termo_table[] PROGMEM = {
 /*  Function Protos                                        */
 /*---------------------------------------------------------*/
 
-int16_t calculateNTC(temperature_table_entry_type adcsum);
+int16_t CalculateNTC(temperature_table_entry_type adcsum);

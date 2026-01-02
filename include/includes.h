@@ -24,17 +24,17 @@
  * Is intended for project specific (private) libraries
  */
 //#include "b3380_1.h"
-//#include "SensorTypeNTC.h"
-//#include "Relay.h"
-#include "ButtonTTB.h"
+//#include "adc2tempC_NTCschA.h"
+//#include "relay.h"
+#include "buttonTTB.h"
 
 /*
  * Application Header Files, call after project headers
  */
 #include "main.h"
-#include "Controls\ControllerEngine.h"
-#include "Controls\ControllerIndoor.h"
-#include "Controls\ControllerPacket.h"
+//#include "Controls\controllerEngine.h"
+//#include "Controls\controllerIndoor.h"
+#include "Controls\controllerPacket.h"
 //#include "Display\DisplayLCD_Menu.h"
 //#include "Display\MenuLCD1602.h"
 //#include "Display\ControllerLCD1602.h"

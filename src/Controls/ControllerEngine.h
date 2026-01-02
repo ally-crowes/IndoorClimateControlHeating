@@ -1,7 +1,9 @@
 #ifndef __CONTROL_ENGINE_H__
 #define __CONTROL_ENGINE_H__
-#include "SensorTypeNTC.h"
-#include "Relay.h"
+
+// #include "\lib\T-Sensor\TypeNTC_Thermistor\tSensorTypeNTC.h"
+#include <tSensorTypeNTC.h>
+#include "relayDevice.h"
 
 enum ModeAction // heat, cool, range in/out
 {
@@ -36,49 +38,51 @@ struct CONTROL_FLAGS // NOT USED - for moved to create example
 class ControllerEngine
 {
 private:
-    SensorTypeNTC *sensorEngine;
-    Relay *relayA;
-    Relay *relayB;
+    SensorTypeNTC *sensorEngine = NULL;
+    RelayDevice *relayA = NULL;
+    RelayDevice *relayB = NULL;
     ModeAction action = ModeAction::Heat;
     ModeSwitchingDevice switching = ModeSwitchingDevice::FirstOnly;
     unsigned int count = 0;
     bool flagRelay = false;
     bool flagDriversWait = false;
 
-    void RelaysOn();
-    void RelaysOff();
+    void relaysOn();
+    void relaysOff();
 
 protected:
-    float* eeprom_minTemperature;
-    float* eeprom_maxTemperature;
+    float* eeprom_minTemperature = NULL;
+    float* eeprom_maxTemperature = NULL;
 
 public:
     //ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature);
-    ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature);
-    ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB);
-    ControllerEngine(SensorTypeNTC *sensor, Relay *relay, ModeAction action);
+    ControllerEngine(SensorTypeNTC *sensor, RelayDevice *relayA, RelayDevice *relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature);
+    /* TODO  
+    // ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB);
+    // ControllerEngine(SensorTypeNTC *sensor, Relay *relay, ModeAction action);
+    */
+
+    ModeAction getAction() const;
+    void setAction(ModeAction action);
+    ModeSwitchingDevice getSwitchingDevice() const;
+    void setSwitchingDevice(ModeSwitchingDevice switching);
     
-    ModeAction GetAction() const;
-    void SetAction(ModeAction action);
-    ModeSwitchingDevice GetSwitchingDevice() const;
-    void SetSwitchingDevice(ModeSwitchingDevice switching);
-    
-    float GetTemperature();
-    void Update();
-    void Wait();     // чекати
+    float getTemperature();
+    void update();
+    void wait();     // чекати
     // void Continue(); // продовжити
-    unsigned int GetCount();
-    bool GetConditionRelay(int n = 1);
-    bool GetCondition();
+    unsigned int getCount();
+    bool getConditionRelay(int n = 1);
+    bool getCondition();
     
-    float GetMinTemperature();
-    void SetMinTemperature(float min);
-    float GetMaxTemperature();
-    void SetMaxTemperature(float max);
-    void ChangeMinUpTemperature(float step = 0.1);
-    void ChangeMinDownTemperature(float step = 0.1);
-    void ChangeMaxUpTemperature(float step = 0.1);
-    void ChangeMaxDownTemperature(float step = 0.1);
+    float getMinTemperature();
+    void setMinTemperature(float min);
+    float getMaxTemperature();
+    void setMaxTemperature(float max);
+    void changeMinUpTemperature(float step = 0.1);
+    void changeMinDownTemperature(float step = 0.1);
+    void changeMaxUpTemperature(float step = 0.1);
+    void changeMaxDownTemperature(float step = 0.1);
 
 };
 

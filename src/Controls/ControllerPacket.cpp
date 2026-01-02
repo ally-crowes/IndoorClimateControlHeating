@@ -1,4 +1,4 @@
-#include "ControllerPacket.h"
+#include "controllerPacket.h"
 
 const char *errorNames[] = {
         "update",       // 0
@@ -170,23 +170,23 @@ void ControllerPacket::temperaturePlus()
   case 0x31:
     if (curentSubMenu == 1)
     {
-      controlIndoor->ChangeMinUpTemperature();
+      controlIndoor->changeMinUpTemperature();
       //controlIndoorExt->temperatureChangeMinUp();
     }
     else if (curentSubMenu == 2)
     {
-      controlIndoor->ChangeMaxUpTemperature();
+      controlIndoor->changeMaxUpTemperature();
       // controlIndoorExt->temperatureChangeMaxUp();
     }
     break;
   case 0x32:
     if (curentSubMenu == 1)
     {
-      controlEngine->ChangeMinUpTemperature();
+      controlEngine->changeMinUpTemperature();
     }
     else if (curentSubMenu == 2)
     {
-      controlEngine->ChangeMaxUpTemperature();
+      controlEngine->changeMaxUpTemperature();
     }
     break;
     
@@ -206,23 +206,23 @@ void ControllerPacket::temperatureMinus()
     case 0x31:
     if (curentSubMenu == 1)
     {
-      controlIndoor->ChangeMinDownTemperature();
+      controlIndoor->changeMinDownTemperature();
       // controlIndoorExt->temperatureChangeMinDown();
     }
     else if (curentSubMenu == 2)
     {
-      controlIndoor->ChangeMaxDownTemperature();
+      controlIndoor->changeMaxDownTemperature();
       // controlIndoorExt->temperatureChangeMaxDown();
     }
     break;
   case 0x32:
     if (curentSubMenu == 1)
     {
-      controlEngine->ChangeMinDownTemperature();
+      controlEngine->changeMinDownTemperature();
     }
     else if (curentSubMenu == 2)
     {
-      controlEngine->ChangeMaxDownTemperature();
+      controlEngine->changeMaxDownTemperature();
     }
     break;
 

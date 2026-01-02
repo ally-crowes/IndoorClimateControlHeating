@@ -1,6 +1,6 @@
 #ifndef __CONTROLLERPACKET_H__
 #define __CONTROLLERPACKET_H__
-#include "Display\MenuLCD1602.h"
+#include "Display\menuLCD1602.h"
 
 //#include "includes.h"
 // #include "..\Extensions\ControllerIndoorExtensions.h"
