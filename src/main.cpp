@@ -10,8 +10,11 @@ float minTemperatureIndoor = eeprom_read_float(EEPROM_TemperatureIndoorMin);// 2
 float maxTemperatureIndoor = eeprom_read_float(EEPROM_TemperatureIndoorMax);// 29.0; 
 
 // Sensor
-SensorTypeNTC* sensorEngine = new SensorTypeNTC(minTemperatureEngine, maxTemperatureEngine, SENSOR_1);
-SensorTypeNTC* sensorIndoor = new SensorTypeNTC(minTemperatureIndoor, maxTemperatureIndoor, SENSOR_2);
+//SensorTypeNTC* sensorEngine = new SensorTypeNTC(minTemperatureEngine, maxTemperatureEngine, SENSOR_1);
+//SensorTypeNTC* sensorIndoor = new SensorTypeNTC(minTemperatureIndoor, maxTemperatureIndoor, SENSOR_2);
+//TSensorBase* sensorIndoor = new SensorTypeNTC(minTemperatureIndoor, maxTemperatureIndoor, SENSOR_2);
+ITSensor* sensorEngine = new SensorTypeNTC(SENSOR_1);
+ITSensor* sensorIndoor = new SensorTypeNTC(SENSOR_2);
 
 // Driver
 RelayDevice* relayA = new RelayDevice(RELAY_1);
@@ -21,8 +24,9 @@ RelayDevice* relayPumb = new RelayDevice(RELAY_4);
 
 // Controller
 //ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, ModeAction::Heat, ModeSwitchingDevice::Parallel, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
-ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
-ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb, EEPROM_TemperatureIndoorMin, EEPROM_TemperatureIndoorMax);
+//ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb, EEPROM_TemperatureIndoorMin, EEPROM_TemperatureIndoorMax);
+ControllerEngine* controlEngine = new ControllerEngine(sensorEngine, relayA, relayB, minTemperatureEngine, maxTemperatureEngine, EEPROM_TemperatureEngineMin, EEPROM_TemperatureEngineMax);
+ControllerIndoor* controlIndoor = new ControllerIndoor(sensorIndoor, controlEngine, relayPumb, minTemperatureIndoor, maxTemperatureIndoor, EEPROM_TemperatureIndoorMin, EEPROM_TemperatureIndoorMax);
 
 // Clock
 DS3231* clockRTC = new DS3231();

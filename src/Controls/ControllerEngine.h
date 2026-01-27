@@ -38,7 +38,7 @@ struct CONTROL_FLAGS // NOT USED - for moved to create example
 class ControllerEngine
 {
 private:
-    SensorTypeNTC *sensorEngine = NULL;
+    ITSensor *sensorEngine = NULL;
     RelayDevice *relayA = NULL;
     RelayDevice *relayB = NULL;
     ModeAction action = ModeAction::Heat;
@@ -47,21 +47,17 @@ private:
     bool flagRelay = false;
     bool flagDriversWait = false;
 
-    void relaysOn();
-    void relaysOff();
+    float min = 0;
+    float max = 0;
 
 protected:
     float* eeprom_minTemperature = NULL;
     float* eeprom_maxTemperature = NULL;
 
 public:
-    //ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature);
-    ControllerEngine(SensorTypeNTC *sensor, RelayDevice *relayA, RelayDevice *relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature);
-    /* TODO  
-    // ControllerEngine(SensorTypeNTC *sensor, Relay *relayA, Relay *relayB);
-    // ControllerEngine(SensorTypeNTC *sensor, Relay *relay, ModeAction action);
-    */
-
+    ControllerEngine(ITSensor* sensor, RelayDevice* relayA, RelayDevice* relayB, float min, float max);
+    ControllerEngine(ITSensor *sensor, RelayDevice *relayA, RelayDevice *relayB, float min, float max, float* eeprom_minTemperature, float* eeprom_maxTemperature);
+   
     ModeAction getAction() const;
     void setAction(ModeAction action);
     ModeSwitchingDevice getSwitchingDevice() const;
@@ -84,6 +80,9 @@ public:
     void changeMaxUpTemperature(float step = 0.1);
     void changeMaxDownTemperature(float step = 0.1);
 
+private:
+    void relaysOn();
+    void relaysOff();
 };
 
 #endif

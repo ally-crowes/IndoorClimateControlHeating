@@ -2,25 +2,32 @@
 
 #include "controllerIndoor.h"
 
-ControllerIndoor::ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngine* controlEngine)
+ControllerIndoor::ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine)
+    : sensorInternal(sensorInternal), controlEngine(controlEngine)
 {
-    this->sensorInternal = sensorInternal;
-    this->controlEngine = controlEngine;
 }
 
-ControllerIndoor::ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump)
-    : sensorInternal(sensorInternal), controlEngine(controlEngine)
+ControllerIndoor::ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump)
+    : ControllerIndoor(sensorInternal, controlEngine)
 {
     this->pump = pump;
 }
 
-ControllerIndoor::ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump, float* eeprom_minTemperature, float* eeprom_maxTemperature)
-    : sensorInternal(sensorInternal), controlEngine(controlEngine)
+ControllerIndoor::ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump, float min, float max)
+    : ControllerIndoor(sensorInternal, controlEngine, pump)
 {
-    this->pump = pump;
+    this->min = min;
+    this->max = max;
+}
+    
+ControllerIndoor::ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump, float min, float max, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+    : ControllerIndoor(sensorInternal, controlEngine, pump, min, max)
+{
     this->eeprom_minTemperature = eeprom_minTemperature;
     this->eeprom_maxTemperature = eeprom_maxTemperature;
 }
+
+
 
 float ControllerIndoor::getTemperature()
 {
@@ -47,7 +54,7 @@ void ControllerIndoor::update()
             }
             else
             {
-                if (temperatureCurent <= sensorInternal->getMax()) // Const - Supervise Engine
+                if (temperatureCurent <= this->getMaxTemperature()) // Const - Supervise Engine
                 {
                     controlEngine->update();
                 }
@@ -72,7 +79,7 @@ void ControllerIndoor::update()
                 }
             }
 
-            if (temperatureCurent <= sensorInternal->getMin())  // End - Wait Engine
+            if (temperatureCurent <= this->getMinTemperature())  // End - Wait Engine
             {
                 flagDriversWait = false;
 
@@ -85,14 +92,14 @@ void ControllerIndoor::update()
         break;
 
     case ModeAction::Coll:
-        if (temperatureCurent >= sensorInternal->getMin())
+        if (temperatureCurent >= this->getMinTemperature())
             controlEngine->update();
         else
             controlEngine->wait();
         break;
 
     case ModeAction::RangeMatch:
-        if (temperatureCurent <= sensorInternal->getMax() && temperatureCurent >= sensorInternal->getMin())
+        if (temperatureCurent <= this->getMaxTemperature() && temperatureCurent >= this->getMinTemperature())
             controlEngine->update();
         else
             controlEngine->wait();
@@ -120,22 +127,22 @@ bool ControllerIndoor::getConditionPump()
 
 float ControllerIndoor::getMinTemperature()
 {
-    return sensorInternal->getMin();
+    return this->min;
 }
 
 void ControllerIndoor::setMinTemperature(float min)
 {
-    sensorInternal->setMin(min);
+    this->min = min >= this->max ? this->max - 0.1f : min;
 }
 
 float ControllerIndoor::getMaxTemperature()
 {
-    return sensorInternal->getMax();
+    return this->max;
 }
 
 void ControllerIndoor::setMaxTemperature(float max)
 {
-    sensorInternal->setMax(max);
+    this->max = max <= this->min ? this->min + 0.1f : max;
 }
 
 unsigned long ControllerIndoor::getDelayPumpOff()

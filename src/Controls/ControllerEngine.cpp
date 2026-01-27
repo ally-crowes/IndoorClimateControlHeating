@@ -2,25 +2,19 @@
 
 #include "controllerEngine.h"
 
-// ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching)
-// ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
-// {
-//     this->action = action;
-//     this->switching = switching;
-// }
-
-// ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, Relay* relayA, Relay* relayB, ModeAction action, ModeSwitchingDevice switching, float* eeprom_minTemperature, float* eeprom_maxTemperature)
-//     : ControllerEngine(sensor, relayA, relayB, action, switching)
-// {
-//     this->eeprom_minTemperature = eeprom_minTemperature;
-//     this->eeprom_maxTemperature = eeprom_maxTemperature;
-// }
-
-ControllerEngine::ControllerEngine(SensorTypeNTC* sensor, RelayDevice* relayA, RelayDevice* relayB, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+ControllerEngine::ControllerEngine(ITSensor* sensor, RelayDevice* relayA, RelayDevice* relayB, float min, float max)
 {
     this->sensorEngine = sensor;
     this->relayA = relayA;
     this->relayB = relayB;
+        
+    this->min = min;
+    this->max = max;
+}
+
+ControllerEngine::ControllerEngine(ITSensor* sensor, RelayDevice* relayA, RelayDevice* relayB, float min, float max, float* eeprom_minTemperature, float* eeprom_maxTemperature)
+    : ControllerEngine (sensor, relayA, relayB, min, max)
+{
     this->eeprom_minTemperature = eeprom_minTemperature;
     this->eeprom_maxTemperature = eeprom_maxTemperature;
 }
@@ -125,12 +119,12 @@ void ControllerEngine::update()
     case ModeAction::Heat:
         if (flagDriversWait == false)
         {
-            if (temperatureCurent <= sensorEngine->getMax())
+            if (temperatureCurent <= this->getMaxTemperature())
                 relaysOn();
             else
                 relaysOff();
         }
-        else if (temperatureCurent <= sensorEngine->getMin())
+        else if (temperatureCurent <= this->getMinTemperature())
         {
             flagDriversWait = false;
         }
@@ -139,19 +133,19 @@ void ControllerEngine::update()
     case ModeAction::Coll:
         if (flagDriversWait == false)
         {
-            if (temperatureCurent >= sensorEngine->getMin())
+            if (temperatureCurent >= this->getMinTemperature())
                 relaysOn();
             else
                 relaysOff();
         }
-        else if (temperatureCurent >= sensorEngine->getMax())
+        else if (temperatureCurent >= this->getMaxTemperature())
         {
             flagDriversWait = false;
         }
         break;
 
     case ModeAction::RangeMatch:
-        if (temperatureCurent <= sensorEngine->getMax() && temperatureCurent >= sensorEngine->getMin())
+        if (temperatureCurent <= this->getMaxTemperature() && temperatureCurent >= this->getMinTemperature())
             relaysOn();
         else
             relaysOff();
@@ -196,48 +190,52 @@ bool ControllerEngine::getCondition()
 
 float ControllerEngine::getMinTemperature()
 {
-    return sensorEngine->getMin();
+    return this->min;
 }
 
 void ControllerEngine::setMinTemperature(float min)
 {
-    sensorEngine->setMin(min);
+    this->min = min >= this->max ? this->max - 0.1f : min;
+    //eeprom_write_float(10, GetMinTemperature());
+    eeprom_write_float(eeprom_minTemperature, this->min);
 }
 
 float ControllerEngine::getMaxTemperature()
 {
-    return sensorEngine->getMax();
+    return this->max;
 }
 
 void ControllerEngine::setMaxTemperature(float max)
 {
-    sensorEngine->setMax(max);
+    this->max = max <= this->min ? this->min + 0.1f : max;
+    // eeprom_write_float(20, GetMaxTemperature());
+    eeprom_write_float(eeprom_maxTemperature, this->max);
 }
 
 void ControllerEngine::changeMinUpTemperature(float step)
 {
     setMinTemperature(getMinTemperature() + step);
-    //eeprom_write_float(10, GetMinTemperature());
-    eeprom_write_float(eeprom_minTemperature, getMinTemperature());
+    // //eeprom_write_float(10, GetMinTemperature());
+    // eeprom_write_float(eeprom_minTemperature, getMinTemperature());
 }
 
 void ControllerEngine::changeMinDownTemperature(float step)
 {
     setMinTemperature(getMinTemperature() - step);
-    //eeprom_write_float(10, GetMinTemperature());
-    eeprom_write_float(eeprom_minTemperature, getMinTemperature());
+    // //eeprom_write_float(10, GetMinTemperature());
+    // eeprom_write_float(eeprom_minTemperature, getMinTemperature());
 }
 
 void ControllerEngine::changeMaxUpTemperature(float step)
 {
     setMaxTemperature(getMaxTemperature() + step);
-    // eeprom_write_float(20, GetMaxTemperature());
-    eeprom_write_float(eeprom_maxTemperature, getMaxTemperature());
+    // // eeprom_write_float(20, GetMaxTemperature());
+    // eeprom_write_float(eeprom_maxTemperature, getMaxTemperature());
 }
 
 void ControllerEngine::changeMaxDownTemperature(float step)
 {
     setMaxTemperature(getMaxTemperature() - step);
-    // eeprom_write_float(20, GetMaxTemperature());
-    eeprom_write_float(eeprom_maxTemperature, getMaxTemperature());
+    // // eeprom_write_float(20, GetMaxTemperature());
+    // eeprom_write_float(eeprom_maxTemperature, getMaxTemperature());
 }

@@ -6,22 +6,26 @@
 class ControllerIndoor
 {
 private:
-    SensorTypeNTC* sensorInternal;
-    ControllerEngine* controlEngine;
-    RelayDevice* pump;
+    ITSensor* sensorInternal = NULL;
+    ControllerEngine* controlEngine = NULL;
+    RelayDevice* pump = NULL;
     bool flagDriversWait = false;
     bool flagPumpWait = false;
     unsigned long delayPumpOff = 10000;   // Затримка перед вимкненям насосу після повного нагріву кімнат (10 сек)
     unsigned long delayPumpOn = 3000;   // Затримка увимкненям нагрівачів після увімкниням насосу (3 сек)
     
+    float min = 0;
+    float max = 0;
+    
 protected:
-    float* eeprom_minTemperature;
-    float* eeprom_maxTemperature;
+    float* eeprom_minTemperature = NULL;
+    float* eeprom_maxTemperature = NULL;
 
 public:
-    ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngine* controlEngine);
-    ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump);
-    ControllerIndoor(SensorTypeNTC* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump, float* eeprom_minTemperature, float* eeprom_maxTemperature);
+    ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine);
+    ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump);
+    ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump, float min, float max);
+    ControllerIndoor(ITSensor* sensorInternal, ControllerEngine* controlEngine, RelayDevice* pump, float min, float max, float* eeprom_minTemperature, float* eeprom_maxTemperature);
 
     float getTemperature();
     void update();

@@ -1,21 +1,27 @@
 #ifndef __SENSORTYPENTC_H__
 #define __SENSORTYPENTC_H__
 
-class SensorTypeNTC
+#include "tSensor.h"
+
+class SensorTypeNTC : public ITSensor
 {
 private:
-    int pin = 0;
-    float min = 0;
-    float max = 0;
+    unsigned int _pin = 0;
+
+    // R (Ом) - сопротивление постоянное верхнего плеча делителя (Ом)
+    const float resistUp = 10000.;
+    // Ro (Ом) - сопротивление термистора при temperatureBase (градусах по Цельсию)
+    const float resistBase = 10000.;
+    // температура (градусов Цельсия), при которой измерено сопротивление термистора resistBase
+    const float temperatureBase = 25.;
 
 public:
-    SensorTypeNTC(float min, float max, int pin);
-    const float getMin() const;
-    void setMin(float min);
-    const float getMax() const;
-    void setMax(float max);
+    explicit SensorTypeNTC(unsigned int pin);
 
-    float getTemperature();
+    float getTemperature() const;
+
+private:
+    const float adc2tempC_NTCschA(const int adcValue, const int bConstant) const;
 };
 
 #endif

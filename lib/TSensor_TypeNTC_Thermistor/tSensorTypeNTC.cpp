@@ -1,46 +1,71 @@
 #include <Arduino.h>
-//#include "b3380.h"
-#include "adc2tempC_NTCschA.h"
-
 #include "tSensorTypeNTC.h"
 
-SensorTypeNTC::SensorTypeNTC(float min, float max, int pin)
+SensorTypeNTC::SensorTypeNTC(unsigned int pin) : _pin(pin)
 {
-    this->min = min;
-    this->max = max;
-    this->pin = pin;
-    pinMode(pin, INPUT);
+    //this->_pin = pin;
+    pinMode(_pin, INPUT);
 }
 
-const float SensorTypeNTC::getMin() const
-{
-    return this->min;
-}
-
-void SensorTypeNTC::setMin(float min)
-{
-    this->min = min >= this->max ? this->max - 0.1f : min;
-}
-
-const float SensorTypeNTC::getMax() const
-{
-    return this->max;
-}
-
-void SensorTypeNTC::setMax(float max)
-{
-    this->max = max <= this->min ? this->min + 0.1f : max;
-}
-
-float SensorTypeNTC::getTemperature()
+float SensorTypeNTC::getTemperature() const
 {
     // Average value
     int average = 0;
     for (byte i = 0; i < 10; i++)
-        average += analogRead(pin);
+        average += analogRead(_pin);
     average /= 10;
 
-    // return (CalculateNTC(average) / 10.0);
     // return adc2tempC_NTCschA(average, 3380);
     return adc2tempC_NTCschA(average, 3900);
+}
+
+/*
+ *
+ *    Vss -----
+ *            |
+ *            |
+ *           | |
+ *           | | R
+ *           | |
+ *            |        |
+ *            *--------| pin ADC  
+ *            |        |
+ *           | |
+ *           | | Rо
+ *           | |
+ *            |
+ *            |
+ *    GND ----*-------
+ * 
+ *         Sch. A
+ * 
+ */
+
+/*
+ * FUNCTION:   adc2tempC_NTCschA
+ *
+ * PARAMETERS: adcValue - value the analog read of pin,
+ *             bConstant - B-Constant of Thermistor
+ *
+ * PURPOSE:    This function calculated value of temperature 
+ *             bases of value adc pin and B-Constant
+ *             
+ * RETURN:     value of temperature in Celsius
+ *
+ * NOTES:      This function only for schematic A 
+ *             (see file adc2temp_NTCschA.c, schematic - before)
+ *
+ * CHANGES:    
+ *      2023-11-21: Andrii Dubrovin - Created
+ *      2026-01-01: Andrii Dubrovin - Refactoring
+ */
+const float SensorTypeNTC::adc2tempC_NTCschA(const int adcValue, const int bConstant) const 
+{
+  float result;
+  result = resistUp / ((float)1024 / adcValue - 1);  // R
+  result /= resistBase;                              // R/Ro
+  result = log(result) / bConstant;                  // 1/B * ln(R/Ro)
+  result += (float)1.0 / (temperatureBase + 273.15); // + (1/To)
+  result = (float)1.0 / result - 273.15;             // инвертируем и конвертируем в градусы по Цельсию
+  return result;
 }

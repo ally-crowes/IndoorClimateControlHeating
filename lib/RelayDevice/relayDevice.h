@@ -10,6 +10,7 @@ private:
 
 public:
     RelayDevice(int pin);
+    
     bool getCondition();
     void setCondition(bool status);
     unsigned int getCount();
